@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class StudiosConfig(AppConfig):
+class SubscriptionsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Studios'
+    name = 'subscriptions'
