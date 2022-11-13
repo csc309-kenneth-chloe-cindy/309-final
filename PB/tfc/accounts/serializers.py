@@ -6,4 +6,4 @@ from .models import TFCUser
 class TFCUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = TFCUser
-        fields = ['username', 'email', 'firstname', 'lastname', 'phone_number', 'avatar']
+        fields = ['username', 'password', 'email', 'first_name', 'last_name', 'phone_number', 'avatar']
