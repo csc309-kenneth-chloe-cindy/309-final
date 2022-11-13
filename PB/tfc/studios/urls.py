@@ -1,13 +1,12 @@
 from django.urls import path, include
-from rest_framework import routers
-from studios import views
+from studios.views import StudioListView, CreateStudioView, EditStudioView, DeleteStudioView
 
 app_name = 'studios'
 
-router = routers.DefaultRouter()
-router.register(r'add/class', views.StudioViewList)
-
 urlpatterns = [
-    path('', include(router.urls)),
-    
+    path('list/', StudioListView.as_view()),
+    path('new_studio/', CreateStudioView.as_view()),
+    path('<str:studio_name>/edit_studio', EditStudioView.as_view()),
+    path('<str:studio_name>/delete_studio', DeleteStudioView.as_view()),
+    path('<str:amenity_name>/edit_amenities', EditStudioView.as_view()),
 ]
