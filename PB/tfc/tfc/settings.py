@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'class',
     'studios',
     'subscriptions',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

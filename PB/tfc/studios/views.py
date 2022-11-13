@@ -3,9 +3,10 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from studios.serializers import StudioSerializer
+from studios.models import StudioModel
 
-@api_view(['GET', 'POST', 'DELETE'])
 # Create your views here.
-class studio_list(request):
-    if request.method == 'GET':
-        serializer = StudioSerializer()
+class StudioViewList(viewsets.ModelViewSet):
+    queryset = StudioModel.objects.all()
+    serializer_class = StudioSerializer
+    
