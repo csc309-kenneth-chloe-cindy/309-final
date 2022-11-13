@@ -47,5 +47,4 @@ class ClassInstance(models.Model):
 class UserEnroll(models.Model):
     class_instance = models.ForeignKey(to=ClassInstance, on_delete=CASCADE)
     class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE)
-    # TODO: This should point at the new custom user.
-    user = models.ForeignKey(to=User, on_delete=CASCADE, related_name='users')
+    # TODO: Actually add a user
