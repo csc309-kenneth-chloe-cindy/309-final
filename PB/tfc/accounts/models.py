@@ -11,7 +11,7 @@ class TFCUser(AbstractUser):
     first_name = models.CharField(max_length=200, null=False)
     last_name = models.CharField(max_length=200, null=False)
     phone_number = models.CharField(max_length=200, null=False)
-    avatar = models.ImageField()
+    avatar = models.ImageField(upload_to='user-images')
 
     def __str__(self):
         return self.username
