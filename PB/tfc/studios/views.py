@@ -8,7 +8,11 @@ from geopy import distance
 from rest_framework.response import Response
 
 
-# Create your views here.
+"""
+    STUDIO
+
+    Below are views that deal with creating, retrieving, editing/updating and deleting studio objects. 
+"""
 class StudioListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -59,9 +63,31 @@ class DeleteStudioView(DestroyAPIView):
     permission_classes = [IsAdminUser]
 
 
+"""
+    STUDIO IMAGES
+
+    Below are views that deal with creating, retrieving and editing images associated with a studio. 
+"""
+
+
 class CreateStudioImageView(CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = StudioImageSerializer
+
+
+class RetrieveStudioImageView(ListAPIView):
+    serializer_class = StudioImageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return StudioImage.objects.filter(studio=self.kwargs['studio_id'])
+
+
+"""
+    AMENITIES
+    
+    Below are views that deal with creating, retrieving and editing amenities. 
+"""
 
 
 class CreateAmenityView(CreateAPIView):
@@ -77,11 +103,9 @@ class RetrieveAmenitiesView(ListAPIView):
         return StudioAmenities.objects.filter(studio=self.kwargs['studio_id'])
 
 
-class EditAmenityView(RetrieveAPIView, UpdateAPIView):
+class EditAmenityView(UpdateAPIView):
     serializer_class = AmenitySerializer
     permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(Studio, id=self.kwargs['amenity_id'])
-
-
