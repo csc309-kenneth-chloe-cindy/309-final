@@ -5,7 +5,8 @@ from studios.models import Studio, StudioImage, StudioAmenities
 from django.views.generic import TemplateView, ListView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from studios.serializers import StudioSerializer, AmenitySerializer
+from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
+
 
 # Create your views here.
 class StudioListView(ListAPIView):
@@ -15,23 +16,40 @@ class StudioListView(ListAPIView):
     def get_queryset(self):
         return Studio.objects.all()
 
+
 class CreateStudioView(CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = StudioSerializer
 
-class EditStudioView(RetrieveAPIView, UpdateAPIView):
+
+class RetrieveStudioView(RetrieveAPIView):
     serializer_class = StudioSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return get_object_or_404(Studio, id=self.kwargs['studio_id'])
 
-class DeleteStudioView(RetrieveAPIView, DestroyAPIView):
+
+class EditStudioView(UpdateAPIView):
     serializer_class = StudioSerializer
     permission_classes = [IsAdminUser]
 
-    def get_object(self):
-        return get_object_or_404(Studio, id=self.kwargs['studio_id'])
+
+class DeleteStudioView(DestroyAPIView):
+    # TODO: Do we need to do 'retrieveAPIview?' this means that this will also accept GET requests.
+    serializer_class = StudioSerializer
+    permission_classes = [IsAdminUser]
+
+
+class CreateStudioImageView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = StudioImageSerializer
+
+
+class CreateAmenityView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = AmenitySerializer
+
 
 class EditAmenityView(RetrieveAPIView, UpdateAPIView):
     serializer_class = AmenitySerializer
