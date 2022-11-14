@@ -2,24 +2,29 @@ from django.db import models
 from django.db.models import CASCADE
 
 # # Create your models here.
-# class SubscriptionPlan(models.Model):
-#     price = models.FloatField(null=False)
-#     period = models.CharField(max_length=200, null=False)
-#
-#     def __str__(self):
-#         return self.name
-#
-# class Subscription(models.Model):
-#     payment_date = models.CharField(max_length=200, null=False)
-#     subscription_type = models.ForeignKey(to=SubscriptionPlan, on_delete=CASCADE, related_name='subscription_plan')
-#     # payment_method = models.ForeignKey(to=PaymentMethod, on_delete=CASCADE, related_name='payment_method')
-#
-#     def __str__(self):
-#         return self.name
-#
-# class PaymentMethod(models.Model):
-#     card_number = models.CharField(max_length=200, null=False)
-#     security_code = models.CharField(max_length=200, null=False)
-#
-#     def __str__(self):
-#         return self.name
+MODEL_TYPES = (
+    (0, "Yearly"),
+    (1, "Monthly")
+)
+
+
+class SubscriptionPlan(models.Model):
+    price = models.FloatField(null=False)
+    period = models.CharField(max_length=1, choices=MODEL_TYPES)
+
+
+class PaymentMethod(models.Model):
+    card_number = models.PositiveIntegerField()
+    security_code = models.PositiveIntegerField()
+
+
+class PaymentHistory(models.Model):
+    amount = models.PositiveIntegerField()
+    payment_method = models.ForeignKey(to=PaymentMethod, on_delete=CASCADE)
+    date_time = models.DateTimeField()
+
+
+class Subscription(models.Model):
+    payment_date = models.DateField()
+    subscription_type = models.ForeignKey(to=SubscriptionPlan, on_delete=CASCADE)
+    payment_method = models.ForeignKey(to=PaymentMethod, on_delete=CASCADE)
