@@ -10,7 +10,7 @@ MODEL_TYPES = (
 
 class SubscriptionPlan(models.Model):
     price = models.FloatField(null=False)
-    period = models.CharField(max_length=1, choices=MODEL_TYPES)
+    period = models.IntegerField(choices=MODEL_TYPES)
 
 
 class PaymentMethod(models.Model):
