@@ -10,6 +10,7 @@ from studios.serializers import StudioSerializer, AmenitySerializer
 # Create your views here.
 class StudioListView(ListAPIView):
     serializer_class = StudioSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Studio.objects.all()
@@ -23,18 +24,18 @@ class EditStudioView(RetrieveAPIView, UpdateAPIView):
     permission_classes = [IsAdminUser]
 
     def get_object(self):
-        return get_object_or_404(Studio, name=self.kwargs['studio_name'])
+        return get_object_or_404(Studio, id=self.kwargs['studio_id'])
 
 class DeleteStudioView(RetrieveAPIView, DestroyAPIView):
     serializer_class = StudioSerializer
     permission_classes = [IsAdminUser]
 
     def get_object(self):
-        return get_object_or_404(Studio, name=self.kwargs['studio_name'])
+        return get_object_or_404(Studio, id=self.kwargs['studio_id'])
 
 class EditAmenityView(RetrieveAPIView, UpdateAPIView):
     serializer_class = AmenitySerializer
     permission_classes = [IsAdminUser]
 
     def get_object(self):
-        return get_object_or_404(Studio, name=self.kwargs['amenity_name'])
+        return get_object_or_404(Studio, id=self.kwargs['amenity_id'])
