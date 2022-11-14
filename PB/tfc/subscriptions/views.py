@@ -1,13 +1,25 @@
 from rest_framework import status
 from rest_framework.views import APIView
-from .models import Subscription, SubscriptionPlan
+from rest_framework.generics import UpdateAPIView
+from .models import Subscription, SubscriptionPlan, PaymentMethod
 from django.shortcuts import get_object_or_404
-from .serializers import SubscriptionSerializer, PaymentHistorySerializer
+from .serializers import SubscriptionSerializer, PaymentHistorySerializer, PaymentMethodSerializer
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
+
+class UpdatePaymentMethodView(UpdateAPIView):
+    serializer_class = PaymentMethodSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return get_object_or_404(PaymentMethod, pk=self.kwargs['pk'])
+
+
 class SubscriptionDetail(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         return get_object_or_404(Subscription, pk=pk)
