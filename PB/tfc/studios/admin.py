@@ -12,4 +12,6 @@ class StudioAdmin(admin.ModelAdmin):
     fields = fields = ['name', 'address', 'postal_code', 'phone_num', 'longitude', 'latitude']
 
 
-admin.site.register(Studio, StudioImage, StudioAmenities)
+admin.site.register(Studio, StudioAdmin)
+admin.site.register(StudioAmenities)
+admin.site.register(StudioImage)
