@@ -17,7 +17,7 @@ class StudioListView(ListAPIView):
 class CreateStudioView(CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = StudioSerializer
-    
+
 class EditStudioView(RetrieveAPIView, UpdateAPIView):
     serializer_class = StudioSerializer
     permission_classes = [IsAdminUser]
@@ -31,7 +31,7 @@ class DeleteStudioView(RetrieveAPIView, DestroyAPIView):
 
     def get_object(self):
         return get_object_or_404(Studio, name=self.kwargs['studio_name'])
-    
+
 class EditAmenityView(RetrieveAPIView, UpdateAPIView):
     serializer_class = AmenitySerializer
     permission_classes = [IsAdminUser]
