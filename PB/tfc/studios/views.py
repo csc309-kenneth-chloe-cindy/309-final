@@ -69,9 +69,19 @@ class CreateAmenityView(CreateAPIView):
     serializer_class = AmenitySerializer
 
 
+class RetrieveAmenitiesView(ListAPIView):
+    serializer_class = AmenitySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return StudioAmenities.objects.filter(studio=self.kwargs['studio_id'])
+
+
 class EditAmenityView(RetrieveAPIView, UpdateAPIView):
     serializer_class = AmenitySerializer
     permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(Studio, id=self.kwargs['amenity_id'])
+
+
