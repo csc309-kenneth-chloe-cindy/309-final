@@ -7,14 +7,43 @@ from studios.serializers import StudioSerializer, AmenitySerializer, StudioImage
 from geopy import distance
 from rest_framework.response import Response
 
-
 """
     STUDIO
 
     Below are views that deal with creating, retrieving, editing/updating and deleting studio objects. 
 """
+
+
+class CreateStudioView(CreateAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = StudioSerializer
+
+
+class RetrieveStudioView(RetrieveAPIView):
+    serializer_class = StudioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return get_object_or_404(Studio, id=self.kwargs['studio_id'])
+
+
+class EditStudioView(UpdateAPIView):
+    serializer_class = StudioSerializer
+    permission_classes = [IsAdminUser]
+
+
+class DeleteStudioView(DestroyAPIView):
+    serializer_class = StudioSerializer
+    permission_classes = [IsAdminUser]
+
+
 class StudioListView(APIView):
     permission_classes = [IsAuthenticated]
+
+    """
+    Gets a list of studios that are sorted to closest -> furthest from the lat/long passed in
+    from the frontend.
+    """
 
     def get(self, request):
         studio_list = Studio.objects.all()
@@ -40,27 +69,29 @@ class StudioListView(APIView):
         return Response(studios)
 
 
-class CreateStudioView(CreateAPIView):
-    permission_classes = [IsAdminUser]
-    serializer_class = StudioSerializer
-
-
-class RetrieveStudioView(RetrieveAPIView):
-    serializer_class = StudioSerializer
+class StudioMapsDirectionsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return get_object_or_404(Studio, id=self.kwargs['studio_id'])
+    """
+    Returns a Google Maps link that has the destination set to the studio specified.
+    
+    Example: https://www.google.com/maps/dir/?api=1&origin=43.662625,-79.398640&destination=43.661430,-79.397000
+    Example 2: https://www.google.com/maps/dir/?api=1&destination=43.661430,-79.397000
+    """
 
+    def get(self, request, studio_id):
+        link_base = "https://www.google.com/maps/dir/?api=1&destination="
 
-class EditStudioView(UpdateAPIView):
-    serializer_class = StudioSerializer
-    permission_classes = [IsAdminUser]
+        studio = Studio.objects.get(id=studio_id)
 
+        studio_lat = studio.latitude
+        studio_long = studio.longitude
 
-class DeleteStudioView(DestroyAPIView):
-    serializer_class = StudioSerializer
-    permission_classes = [IsAdminUser]
+        link_base = link_base + str(studio_lat) + "," + str(studio_long)
+
+        # print(link_base)
+
+        return Response(link_base)
 
 
 """
