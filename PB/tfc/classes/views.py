@@ -10,18 +10,18 @@ from studios.models import Studio
 
 # Create your views here.
 class CreateClassView(CreateAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassOfferingSerializer
 
 class CancelAllClassView(RetrieveAPIView, DestroyAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassOfferingSerializer
 
     def get_object(self):
         return get_object_or_404(ClassOffering, name=self.kwargs['class_name'], studio=self.kwargs['studio_name'])
 
 class CancelClassInstanceView(RetrieveAPIView, DestroyAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassInstanceSerializer
 
     def get_object(self):
@@ -29,7 +29,7 @@ class CancelClassInstanceView(RetrieveAPIView, DestroyAPIView):
 
 class EditClassView(RetrieveAPIView, UpdateAPIView):
     serializer_class = ClassOfferingSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(ClassOffering, name=self.kwargs['class_name'], studio=self.kwargs['studio_name'])
