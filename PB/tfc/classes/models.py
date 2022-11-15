@@ -28,7 +28,7 @@ class ClassOffering(models.Model):
 class TimeInterval(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
-    day = models.CharField(max_length=1, choices=DAYS_OF_WEEK)
+    day = models.IntegerField(choices=DAYS_OF_WEEK)
     class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE)
 
 
