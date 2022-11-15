@@ -19,7 +19,6 @@ class ClassOffering(models.Model):
     name = models.CharField(max_length=200, null=False)
     description = models.CharField(max_length=200, null=False)
     coach = models.CharField(max_length=200, null=False)
-    times = models.CharField(max_length=200, null=False)
     capacity = models.PositiveIntegerField(null=False)
     end_recursion_date = models.DateField()
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
