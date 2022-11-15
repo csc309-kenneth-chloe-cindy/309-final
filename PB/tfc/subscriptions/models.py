@@ -8,10 +8,22 @@ MODEL_TYPES = (
     (1, "Monthly")
 )
 
+def get_period(num):
+    if num == 0:
+        return "Yearly"
+    else:
+        return "Monthly"
+
 
 class SubscriptionPlan(models.Model):
     price = models.FloatField(null=False)
     period = models.IntegerField(choices=MODEL_TYPES)
+
+    def __str__(self):
+        if self.period == 0:
+            return f"price: {self.price}, period: yearly"
+        if self.period == 1:
+            return f"price: {self.price}, period: monthly"
 
 
 class PaymentMethod(models.Model):
@@ -32,3 +44,4 @@ class Subscription(models.Model):
     payment_method = models.ForeignKey(to=PaymentMethod, on_delete=CASCADE)
     # add user
     user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)
+    next_payment_date = models.DateField()
