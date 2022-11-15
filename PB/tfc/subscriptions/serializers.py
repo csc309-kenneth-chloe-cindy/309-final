@@ -34,6 +34,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     subscription_type_id = serializers.IntegerField(write_only=True)
 
+
+
+
     def create(self, validated_data):
         payment_method_data = validated_data.pop("payment_method")
         user = self.context.get("user")

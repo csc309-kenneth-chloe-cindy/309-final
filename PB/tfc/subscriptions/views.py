@@ -45,18 +45,51 @@ class GetPaymentHistory(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class DeleteSubscription(APIView):
+class UpdateSubscription(UpdateAPIView):
+    serializer_class = SubscriptionSerializer
+
+    def get_object(self):
+        return get_object_or_404(Subscription, pk=self.kwargs['pk'])
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+
+class DeleteUpdateSubscription(APIView):
     permission_classes = [IsAuthenticated]
+
+    def _get_billing_period_end(self, date):
+        return date + relativedelta(days=-1)
 
     def get_object(self, pk):
         return get_object_or_404(Subscription, pk=pk)
 
+    def patch(self, request, *args, **kwargs):
+        """
+        only allows patch of subscription type
+
+
+        """
+        orig_subscription = self.get_object(kwargs['pk'])
+        new_subscription_type = request.data["subscription_type_id"]
+        orig_subscription.subscription_type = new_subscription_type
+        orig_subscription.save()
+        serializer = SubscriptionSerializer(orig_subscription)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        orig_subscription = self.get_object(kwargs['pk'])
+        orig_payment_date = orig_subscription.next_payment_date
+        serializer = SubscriptionSerializer(orig_subscription, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     def delete(self, request, *args, **kwargs):
         subscription = self.get_object(kwargs['pk'])
 
-        billing_period_end = subscription.next_payment_date + relativedelta(days=-1)
-        print("BILLING PERIOD END")
-        print(billing_period_end)
+        billing_period_end = self._get_billing_period_end(subscription.next_payment_date)
         to_unenroll = ClassInstance.objects \
             .filter(userenroll__user__pk=subscription.user.id).filter(date__gt=billing_period_end)
         for class_instance in to_unenroll:
