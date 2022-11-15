@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Studio, StudioImage, StudioAmenities
-
+from classes.admin import ClassOfferingInline
 # Register your models here.
 
 class StudioImageInline(admin.TabularInline):
@@ -8,8 +8,8 @@ class StudioImageInline(admin.TabularInline):
     fields = ['image_as_blob']
 
 class StudioAdmin(admin.ModelAdmin):
-    inlines = [StudioImageInline]
-    fields = fields = ['name', 'address', 'postal_code', 'phone_num', 'longitude', 'latitude']
+    inlines = [StudioImageInline, ClassOfferingInline]
+    fields = ['name', 'address', 'postal_code', 'phone_num', 'longitude', 'latitude']
 
 
 admin.site.register(Studio, StudioAdmin)
