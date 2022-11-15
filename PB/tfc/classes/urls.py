@@ -4,8 +4,8 @@ from .views import CreateClassView, CancelAllClassView, CancelClassInstanceView,
 app_name = 'classes'
 
 urlpatterns = [
-    path('<str:studio_name>/new_class/', CreateClassView.as_view()),
-    path('<str:studio_name>/cancel/<str:class_name>/all_classes', CancelAllClassView.as_view()),
-    path('<str:studio_name>/edit/<str:class_name>', EditClassView.as_view()),
-    path('<str:studio_name>/cancel/<str:class_name>/<int:class_instance_id>', CancelClassInstanceView.as_view())
+    path('<int:studio_id>/new/', CreateClassView.as_view()),
+    path('<int:studio_id>/cancel/<int:class_id>/all/', CancelAllClassView.as_view()),
+    path('<int:studio_id>/edit/<int:class_id>/', EditClassView.as_view()),
+    path('<int:studio_id>/cancel/<int:class_id>/<int:class_instance_id>/', CancelClassInstanceView.as_view())
 ]
