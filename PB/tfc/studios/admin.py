@@ -1,11 +1,13 @@
 from django.contrib import admin
 from .models import Studio, StudioImage, StudioAmenities
 
+
 # Register your models here.
 
 class StudioImageInline(admin.TabularInline):
     model = StudioImage
-    fields = ['image_as_blob']
+    fields = ['image']
+
 
 class StudioAdmin(admin.ModelAdmin):
     inlines = [StudioImageInline]

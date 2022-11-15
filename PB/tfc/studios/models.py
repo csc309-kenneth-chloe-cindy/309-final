@@ -18,7 +18,7 @@ class Studio(models.Model):
 
 class StudioImage(models.Model):
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE, related_name='studio_images')
-    image_as_blob = models.BinaryField()
+    image = models.ImageField(upload_to='studio-images')
 
 
 class StudioAmenities(models.Model):
