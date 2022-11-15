@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import CASCADE
 from studios.models import Studio
+from accounts.models import TFCUser
 
 # based on https://stackoverflow.com/questions/5966629/django-days-of-week-representation-in-model
 DAYS_OF_WEEK = (
@@ -19,7 +20,6 @@ class ClassOffering(models.Model):
     name = models.CharField(max_length=200, null=False)
     description = models.CharField(max_length=200, null=False)
     coach = models.CharField(max_length=200, null=False)
-    times = models.CharField(max_length=200, null=False)
     capacity = models.PositiveIntegerField(null=False)
     end_recursion_date = models.DateField()
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
@@ -47,4 +47,4 @@ class ClassInstance(models.Model):
 class UserEnroll(models.Model):
     class_instance = models.ForeignKey(to=ClassInstance, on_delete=CASCADE)
     class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE)
-    # TODO: Actually add a user
+    user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)

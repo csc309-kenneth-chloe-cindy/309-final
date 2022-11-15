@@ -11,6 +11,7 @@ from rest_framework.renderers import JSONRenderer
 
 # Create your views here.
 
+
 class UpdatePaymentMethodView(UpdateAPIView):
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsAuthenticated]
@@ -47,6 +48,11 @@ class SubscriptionDetail(APIView):
 
     def get_object(self, pk):
         return get_object_or_404(Subscription, pk=pk)
+
+    def delete(self, request, *args, **kwargs):
+        subscription = self.get_object(kwargs['pk'])
+
+        # drop classes
 
     def post(self, request, *args, **kwargs):
         subscription_serializer = SubscriptionSerializer(data=request.data,
