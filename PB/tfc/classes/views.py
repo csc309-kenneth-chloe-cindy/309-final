@@ -18,18 +18,18 @@ class CancelAllClassView(RetrieveAPIView, DestroyAPIView):
     serializer_class = ClassOfferingSerializer
 
     def get_object(self):
-        return get_object_or_404(ClassOffering, name=self.kwargs['class_name'], studio=self.kwargs['studio_name'])
+        return get_object_or_404(ClassOffering, id=self.kwargs['class_id'])
 
 class CancelClassInstanceView(RetrieveAPIView, DestroyAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = ClassInstanceSerializer
 
     def get_object(self):
-        return get_object_or_404(ClassInstance, id=self.kwargs['class_instance_id'], studio=self.kwargs['studio_name'])
+        return get_object_or_404(ClassInstance, id=self.kwargs['class_instance_id'])
 
 class EditClassView(RetrieveAPIView, UpdateAPIView):
     serializer_class = ClassOfferingSerializer
     permission_classes = [IsAdminUser]
 
     def get_object(self):
-        return get_object_or_404(ClassOffering, name=self.kwargs['class_name'], studio=self.kwargs['studio_name'])
+        return get_object_or_404(ClassOffering, id=self.kwargs['class_id'])
