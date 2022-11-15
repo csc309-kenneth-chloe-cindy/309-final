@@ -14,7 +14,7 @@ class StudioListView(ListAPIView):
     def get_queryset(self):
         return Studio.objects.all()
 
-class CreateStudioView(CreateAPIView):
+class CreateStudioView(RetrieveAPIView, CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = StudioSerializer
     

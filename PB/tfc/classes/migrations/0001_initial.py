@@ -40,8 +40,8 @@ class Migration(migrations.Migration):
             name='UserEnroll',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('class_instance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='class.classinstance')),
-                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='class.classoffering')),
+                ('class_instance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.classinstance')),
+                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.classoffering')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='users', to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('start_time', models.TimeField()),
                 ('end_time', models.TimeField()),
                 ('day', models.CharField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')], max_length=1)),
-                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='class.classoffering')),
+                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.classoffering')),
             ],
         ),
         migrations.CreateModel(
@@ -60,12 +60,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('keyword', models.CharField(max_length=200)),
-                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='class.classoffering')),
+                ('class_offering', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='classes.classoffering')),
             ],
         ),
         migrations.AddField(
             model_name='classinstance',
             name='class_offering',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='class_offering', to='class.classoffering'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='class_offering', to='classes.classoffering'),
         ),
     ]
