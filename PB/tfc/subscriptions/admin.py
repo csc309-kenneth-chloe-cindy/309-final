@@ -3,8 +3,3 @@ from .models import SubscriptionPlan, Subscription, PaymentHistory, PaymentMetho
 
 # Register your models here.
 admin.site.register(SubscriptionPlan)
-
-# DELETE
-admin.site.register(Subscription)
-admin.site.register(PaymentHistory)
-admin.site.register(PaymentMethod)

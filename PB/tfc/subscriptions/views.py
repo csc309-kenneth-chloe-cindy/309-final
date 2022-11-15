@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import UpdateAPIView
-from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory, get_period
+from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory
 from classes.models import ClassInstance
 from django.shortcuts import get_list_or_404, get_object_or_404
 from .serializers import SubscriptionSerializer, PaymentHistorySerializer, PaymentMethodSerializer
@@ -26,14 +26,11 @@ class GetPaymentHistory(APIView, LimitOffsetPagination):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        print(kwargs)
         user_id = kwargs["user_id"]
         subscription = get_object_or_404(Subscription, user=user_id)
 
         payment_historys = get_list_or_404(PaymentHistory,
                                            payment_method=subscription.payment_method.id)
-        print("found payment history")
-        print(payment_historys)
         paginated_payment_historys = self.paginate_queryset(payment_historys, request, view=self)
 
         subscription_plan = get_object_or_404(Subscription,

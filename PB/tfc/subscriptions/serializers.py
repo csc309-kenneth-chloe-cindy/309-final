@@ -34,9 +34,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     subscription_type_id = serializers.IntegerField(write_only=True)
 
-
-
-
     def create(self, validated_data):
         payment_method_data = validated_data.pop("payment_method")
         user = self.context.get("user")
@@ -50,11 +47,9 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if subscription_type == 0:
             # yearly
             next_payment_date = last_payment_date + relativedelta(years=1)
-            print("with year jump: ", next_payment_date)
         elif subscription_type == 1:
             # monthly
             next_payment_date = last_payment_date + relativedelta(months=1)
-            print("with month jump: ", next_payment_date)
 
         subscription = Subscription.objects.create(payment_method=payment_method, user=user,
                                                    next_payment_date=next_payment_date,
