@@ -17,19 +17,19 @@ from .models import TimeInterval, Keyword
     CLASS_OFFERING
 """
 class CreateClassOfferingView(CreateAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassOfferingSerializer
 
 class EditClassOfferingView(RetrieveAPIView, UpdateAPIView):
     serializer_class = ClassOfferingSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def get_object(self):
         return get_object_or_404(ClassOffering, id=self.kwargs['class_offering_id'])
 
 class DeleteClassOfferingView(DestroyAPIView):
     serializer_class = ClassOfferingSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
 
 """
@@ -37,12 +37,12 @@ class DeleteClassOfferingView(DestroyAPIView):
 """
 
 class CreateTimeIntervalView(CreateAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = TimeIntervalSerializer
 
 class EditTimeIntervalView(RetrieveAPIView, UpdateAPIView):
     serializer_class = TimeIntervalSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def get_query(self):
         return TimeInterval.objects.filter(class_offering=self.kwargs['class_offering_id'])
@@ -52,12 +52,12 @@ class EditTimeIntervalView(RetrieveAPIView, UpdateAPIView):
 """
 
 class CreateKeywordView(CreateAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = KeywordSerializer
 
 class EditKeywordView(RetrieveAPIView, UpdateAPIView):
     serializer_class = KeywordSerializer
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
 
     def get_query(self):
         return Keyword.objects.filter(studio=self.kwargs['studio_id'])
@@ -67,11 +67,11 @@ class EditKeywordView(RetrieveAPIView, UpdateAPIView):
 """
 
 class CreateClassInstanceView(CreateAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassInstanceSerializer
 
 class DeleteAllClassInstanceView(DestroyAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassInstanceSerializer
 
     def get_query(self):
@@ -83,7 +83,7 @@ class DeleteAllClassInstanceView(DestroyAPIView):
         return new_list
 
 class DeleteSingleClassInstanceView(DestroyAPIView):
-    #permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser]
     serializer_class = ClassInstanceSerializer
     def get_object(self):
         return get_object_or_404(ClassInstance, id=self.kwargs['class_instance_id'])
