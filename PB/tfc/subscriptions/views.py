@@ -3,11 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.generics import UpdateAPIView
 from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory, get_period
 from classes.models import ClassInstance
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from .serializers import SubscriptionSerializer, PaymentHistorySerializer, PaymentMethodSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-import datetime
+from rest_framework.pagination import LimitOffsetPagination
 from dateutil.relativedelta import relativedelta
 
 
@@ -22,27 +22,31 @@ class UpdatePaymentMethodView(UpdateAPIView):
         return get_object_or_404(PaymentMethod, pk=self.kwargs['pk'])
 
 
-class GetPaymentHistory(APIView):
+class GetPaymentHistory(APIView, LimitOffsetPagination):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        # payment history object -> search for subscription plan with this id
         print(kwargs)
-        payment_history = get_object_or_404(PaymentHistory, pk=kwargs["pk"])
+        user_id = kwargs["user_id"]
+        subscription = get_object_or_404(Subscription, user=user_id)
+
+        payment_historys = get_list_or_404(PaymentHistory,
+                                           payment_method=subscription.payment_method.id)
         print("found payment history")
+        print(payment_historys)
+        paginated_payment_historys = self.paginate_queryset(payment_historys, request, view=self)
 
         subscription_plan = get_object_or_404(Subscription,
-                                              payment_method=payment_history.payment_method)
+                                              payment_method=subscription.payment_method)
         future_payment = subscription_plan.subscription_type.price
 
-        print(future_payment)
-
-        payment_history_serializer = PaymentHistorySerializer(payment_history)
-        response_data = payment_history_serializer.data
+        payment_history_serializer = PaymentHistorySerializer(paginated_payment_historys,
+                                                              many=True)
+        response_data = {"payment_history": payment_history_serializer.data}
         response_data["future_payment"] = {"price": future_payment,
                                            "date": subscription_plan.next_payment_date}
 
-        return Response(response_data, status=status.HTTP_200_OK)
+        return self.get_paginated_response(response_data)
 
 
 class UpdateSubscription(UpdateAPIView):

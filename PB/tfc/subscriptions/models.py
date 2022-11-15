@@ -7,6 +7,8 @@ MODEL_TYPES = (
     (0, "Yearly"),
     (1, "Monthly")
 )
+
+
 def get_period(num):
     if num == 0:
         return "Yearly"
@@ -39,7 +41,7 @@ class PaymentHistory(models.Model):
 class Subscription(models.Model):
     # subscription type is one subscription type to many subscriptions
     subscription_type = models.ForeignKey(to=SubscriptionPlan, on_delete=CASCADE)
-    # subscription payment method is one subscription to many payment mehtods
+    # subscription payment method is one subscription to one payment mehtods
     payment_method = models.ForeignKey(to=PaymentMethod, on_delete=CASCADE)
     # add user
     user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)
