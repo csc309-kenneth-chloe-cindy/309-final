@@ -2,11 +2,13 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import UpdateAPIView
 from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory, get_period
+from classes.models import ClassInstance
 from django.shortcuts import get_object_or_404
 from .serializers import SubscriptionSerializer, PaymentHistorySerializer, PaymentMethodSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import JSONRenderer
+import datetime
+from dateutil.relativedelta import relativedelta
 
 
 # Create your views here.
@@ -43,7 +45,7 @@ class GetPaymentHistory(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class SubscriptionDetail(APIView):
+class DeleteSubscription(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
@@ -52,7 +54,27 @@ class SubscriptionDetail(APIView):
     def delete(self, request, *args, **kwargs):
         subscription = self.get_object(kwargs['pk'])
 
+        billing_period_end = subscription.next_payment_date + relativedelta(days=-1)
+        print("BILLING PERIOD END")
+        print(billing_period_end)
+        to_unenroll = ClassInstance.objects \
+            .filter(userenroll__user__pk=subscription.user.id).filter(date__gt=billing_period_end)
+        for class_instance in to_unenroll:
+            class_instance.capacity_count -= 1
+
+            class_instance.userenroll_set.all().delete()
+            class_instance.save()
+        subscription.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
         # drop classes
+
+
+class SubscriptionDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk):
+        return get_object_or_404(Subscription, pk=pk)
 
     def post(self, request, *args, **kwargs):
         subscription_serializer = SubscriptionSerializer(data=request.data,

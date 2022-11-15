@@ -7,7 +7,6 @@ MODEL_TYPES = (
     (0, "Yearly"),
     (1, "Monthly")
 )
-
 def get_period(num):
     if num == 0:
         return "Yearly"
