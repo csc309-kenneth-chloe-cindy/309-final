@@ -1,8 +1,10 @@
+from django.core.paginator import Paginator
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from studios.models import Studio, StudioImage, StudioAmenities
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
 from geopy import distance
 from rest_framework.response import Response
@@ -37,8 +39,9 @@ class DeleteStudioView(DestroyAPIView):
     permission_classes = [IsAdminUser]
 
 
-class StudioListView(APIView):
+class StudioListView(APIView, LimitOffsetPagination):
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPagination
 
     """
     Gets a list of studios that are sorted to closest -> furthest from the lat/long passed in
@@ -47,8 +50,8 @@ class StudioListView(APIView):
 
     def get(self, request):
         studio_list = Studio.objects.all()
-
         user_location = (request.data['latitude'], request.data['longitude'])
+
         studio_to_distance = []
 
         for studio in studio_list:
@@ -64,9 +67,23 @@ class StudioListView(APIView):
 
         studios = [i[0] for i in studio_to_distance]
 
+        page_studio_lst = Paginator(studios, 15)
+        # print(page_studio_lst.page(1).object_list)
+
         # print(studios)
 
-        return Response(studios)
+        pg = request.GET.get("page")
+
+        if pg is not None:
+            page_num = int(pg)
+            # print(page_num)
+
+            # If you have only 2 pages, but the query param sends in page=3,
+            # it will just return the last page (page 2)
+            return Response(page_studio_lst.get_page(page_num).object_list)
+        else:
+            # Defaults to returning the whole list of studios if no page is given.
+            return Response(studios)
 
 
 class StudioMapsDirectionsView(APIView):
@@ -82,7 +99,7 @@ class StudioMapsDirectionsView(APIView):
     def get(self, request, studio_id):
         link_base = "https://www.google.com/maps/dir/?api=1&destination="
 
-        studio = Studio.objects.get(id=studio_id)
+        studio = get_object_or_404(Studio, id=studio_id)  # Studio.objects.get(id=studio_id)
 
         studio_lat = studio.latitude
         studio_long = studio.longitude
@@ -106,12 +123,15 @@ class CreateStudioImageView(CreateAPIView):
     serializer_class = StudioImageSerializer
 
 
-class RetrieveStudioImageView(ListAPIView):
+class RetrieveStudioImageView(ListAPIView, LimitOffsetPagination):
     serializer_class = StudioImageSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        return StudioImage.objects.filter(studio=self.kwargs['studio_id'])
+        studio_images = get_list_or_404(StudioImage, studio=self.kwargs['studio_id'])
+
+        return studio_images  # StudioImage.objects.filter(studio=self.kwargs['studio_id'])
 
 
 """
@@ -126,12 +146,15 @@ class CreateAmenityView(CreateAPIView):
     serializer_class = AmenitySerializer
 
 
-class RetrieveAmenitiesView(ListAPIView):
+class RetrieveAmenitiesView(ListAPIView, LimitOffsetPagination):
     serializer_class = AmenitySerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        return StudioAmenities.objects.filter(studio=self.kwargs['studio_id'])
+        studio_amenities = get_list_or_404(StudioAmenities, studio=self.kwargs['studio_id'])
+
+        return studio_amenities
 
 
 class EditAmenityView(UpdateAPIView):

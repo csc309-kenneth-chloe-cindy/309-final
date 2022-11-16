@@ -9,11 +9,11 @@ class StudioSerializer(serializers.ModelSerializer):
 
 
 class StudioImageSerializer(serializers.ModelSerializer):
-    studio = StudioSerializer(read_only=True)
+    # studio = StudioSerializer(read_only=True)
 
     class Meta:
         model = StudioImage
-        fields = ['studio', 'image']
+        fields = ['image']
 
 
 class AmenitySerializer(serializers.ModelSerializer):
