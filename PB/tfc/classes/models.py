@@ -67,6 +67,12 @@ class ClassOffering(models.Model):
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
 
 
+    def delete_future_instances(self):
+        today = datetime.date.today()
+        class_instances = self.classinstance_set.filter(date__gte=today)
+        class_instances.delete()
+
+
 class TimeInterval(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -100,8 +106,7 @@ class Keyword(models.Model):
 class ClassInstance(models.Model):
     date = models.DateField()
     capacity_count = models.PositiveIntegerField(default=0, null=False)
-    class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE,
-                                       related_name='class_offering')
+    class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE)
 
     def __str__(self):
         return f"pk: {self.pk}, date: {self.date}, capacity: {self.capacity_count}"

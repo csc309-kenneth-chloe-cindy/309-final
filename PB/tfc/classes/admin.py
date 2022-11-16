@@ -26,6 +26,12 @@ class ClassOfferingAdmin(admin.ModelAdmin):
 
 
 class ClassInstanceAdmin(admin.ModelAdmin):
+    actions = ['delete_future']
+
+    @admin.action(description="Delete all future class instances")
+    def delete_future(self, request, queryset):
+        ClassOffering.delete_future_instances()
+
     def has_change_permission(self, request, obj=None):
         return False
 
