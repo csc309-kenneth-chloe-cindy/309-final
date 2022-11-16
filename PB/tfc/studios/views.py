@@ -8,6 +8,10 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
 from geopy import distance
 from rest_framework.response import Response
+from classes.models import ClassOffering, ClassInstance, TimeInterval
+from classes.serializers import ClassOfferingSerializer
+from django.db.models import Q
+from datetime import *
 
 """
     STUDIO
@@ -109,6 +113,42 @@ class StudioMapsDirectionsView(APIView):
         # print(link_base)
 
         return Response(link_base)
+
+
+class StudioClassListView(APIView, LimitOffsetPagination):
+    permission_classes = [IsAuthenticated]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, studio_id):
+        class_offerings = get_list_or_404(ClassOffering, studio_id=studio_id)
+
+        offerings_to_instances = []
+
+        for c in class_offerings:
+            today = date.today()
+            right_now = time(5, 0, 0) # datetime.now().time() TODO: remove this later
+
+            cls = TimeInterval.objects.get(class_offering=c.id)
+            print(cls.start_time)
+            print(cls.start_time > right_now)
+
+            instances = ClassInstance.objects.filter(Q(class_offering=c.id) & Q(date__gt=today))
+
+            # instances_after_right_now = instances.filter(class_offering__gt)
+
+
+            # ClassInstance.objects.filter(date__gt=today)
+            # ClassInstance.objects.filter(Q(class_offering=c.id) & Q(date__gt=today))
+            # ClassInstance.objects.filter(class_offering=c.id)
+
+            # print(c)
+            print(instances)
+
+            offerings_to_instances.append((c))
+
+        # print(class_offerings)
+
+        return Response(1)
 
 
 """
