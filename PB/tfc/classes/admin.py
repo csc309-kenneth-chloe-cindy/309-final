@@ -12,7 +12,7 @@ class KeywordAdmin(admin.TabularInline):
     model = Keyword
 
 
-class ClassAdmin(admin.ModelAdmin):
+class ClassOfferingAdmin(admin.ModelAdmin):
     inlines = [TimeIntervalAdmin, KeywordAdmin]
 
     def has_change_permission(self, request, obj=None):
@@ -21,5 +21,18 @@ class ClassAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, request):
+        return True
+        # TODO: set false
 
-admin.site.register(ClassOffering, ClassAdmin)
+
+class ClassInstanceAdmin(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+
+admin.site.register(ClassOffering, ClassOfferingAdmin)
+admin.site.register(ClassInstance, ClassInstanceAdmin)
