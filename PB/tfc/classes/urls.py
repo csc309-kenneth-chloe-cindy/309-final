@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import EnrollSingleInstance
+from .views import EnrollSingleInstance, EnrollFuture
 
 app_name = 'classes'
 
 urlpatterns = [
-    path('class_instance_enroll/<int:class_id>/', EnrollSingleInstance.as_view())
+    path('enroll/single_class/<int:class_id>/', EnrollSingleInstance.as_view()),
+    path('enroll/future_classes/<int:class_id>/', EnrollFuture.as_view()),
 
 ]

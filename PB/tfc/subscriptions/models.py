@@ -49,4 +49,4 @@ class Subscription(models.Model):
 
 
 def has_active_subscription(user_id):
-    return Subscription.objects.exists(user=user_id)
+    return Subscription.objects.filter(user=user_id).exists()

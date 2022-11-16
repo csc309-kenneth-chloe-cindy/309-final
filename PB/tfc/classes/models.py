@@ -7,7 +7,9 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 import dateutil.relativedelta as rd
 import calendar
-from .exceptions import AlreadyEnrolledException, FullCapacityException
+from .exceptions import AlreadyEnrolledException, FullCapacityException, NotSubscribedException, \
+    TargetInPastException
+from subscriptions.models import has_active_subscription
 from django.shortcuts import get_object_or_404
 
 # based on https://stackoverflow.com/questions/5966629/django-days-of-week-representation-in-model
@@ -73,12 +75,22 @@ class ClassOffering(models.Model):
         class_instances = self.classinstance_set.filter(date__gte=today)
         class_instances.delete()
 
-    def enroll_user(self, user_id):
-        """
-
-        Returns: True if user enrolled successfully, False if user enrollment failed (bc of capacity
-
-        """
+    def enroll_user(self, user):
+        # check for subscription
+        if not has_active_subscription(user.id):
+            raise NotSubscribedException
+        enrolled_classes = []
+        # future occurrences
+        today = datetime.date.today()
+        future_class_instances = self.classinstance_set.filter(date__gte=today)
+        for class_instance in future_class_instances:
+            try:
+                enrolled_class = class_instance.enroll_user(user)
+                enrolled_classes.append(enrolled_class)
+            except Exception:
+                # ignore these
+                pass
+        return enrolled_classes
 
 
 # https://stackoverflow.com/questions/1355150/when-saving-how-can-you-check-if-a-field-has-changed
@@ -171,16 +183,23 @@ class ClassInstance(models.Model):
         return self.userenroll_set.filter(user=user).exists()
 
     def enroll_user(self, user):
+        # check that it is in the future
+        if self.date <= datetime.date.today():
+            raise TargetInPastException
+        # check for subscription
+        if not has_active_subscription(user.id):
+            raise NotSubscribedException
         if self.capacity_count == self.class_offering.capacity:
             raise FullCapacityException
         if self.user_enrolled(user):
             raise AlreadyEnrolledException
-        # check if already enrolled
         self.capacity_count += 1
         user_enroll = UserEnroll.objects.create(class_instance=self,
                                                 class_offering=self.class_offering, user=user)
         user_enroll.save()
         self.save()
+
+        return self
 
 
 class UserEnroll(models.Model):
