@@ -23,7 +23,6 @@ class ClassOfferingAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return True
-        # TODO: set false
 
 
 class ClassInstanceAdmin(admin.ModelAdmin):

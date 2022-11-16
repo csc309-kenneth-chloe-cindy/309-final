@@ -66,57 +66,6 @@ class ClassOffering(models.Model):
     end_recursion_date = models.DateField()
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
 
-    def _get_offset_by_weekday(self, day):
-        # TODO: delete
-        # This is just to make the relation explicit
-        return day
-
-    def _get_class_dates_for_this_week(self) -> list[DateTimeInterval]:
-        # TODO: delete
-        time_intervals = self.timeinterval_set.all()
-        print(time_intervals)
-        today = datetime.date.today()
-        start = today - datetime.timedelta(days=today.weekday())
-        end = start + datetime.timedelta(days=6)
-
-        date_time_intervals = []
-
-        for time_interval in time_intervals:
-            date = start + datetime.timedelta(days=self._get_offset_by_weekday(time_interval.day))
-            date_time_intervals.append(
-                DateTimeInterval(date, time_interval.start_time, time_interval.end_time))
-        return date_time_intervals
-
-    def generate_initial_class_instances(self):
-        # TODO: delete
-        print("RUNNING GENERATE INITIAL")
-        date_time_intervals = self._get_class_dates_for_this_week()
-        end_recursion_date = self.end_recursion_date
-        today = datetime.date.today()
-        now = datetime.datetime.now().time()
-        for date_time_interval in date_time_intervals:
-            print(date_time_interval)
-        generate = False
-
-        class_instances = []
-
-        while generate:
-            for date_time_interval in date_time_intervals:
-                class_instance = None
-                if date_time_interval > end_recursion_date:
-                    generate = False
-                    continue
-                if today == date_time_interval:
-                    if date_time_interval.start > now:
-                        class_instance = ClassInstance(date=date_time_interval.date,
-                                                       class_offering=self)
-                elif today < date_time_interval.date:
-                    class_instance = ClassInstance(date=date_time_interval.date,
-                                                   class_offering=self)
-                class_instances.append(class_instance)
-                date_time_interval.date = date_time_interval.date + datetime.timedelta(days=7)
-        ClassInstance.objects.bulk_create(class_instances)
-
 
 class TimeInterval(models.Model):
     start_time = models.TimeField()
@@ -140,7 +89,6 @@ class TimeInterval(models.Model):
 
 @receiver(post_save, sender=TimeInterval)
 def create_instances(sender, instance, **kwargs):
-    print("RUNNING ON MODEL LEVEL")
     instance.generate_future_class_instances(datetime.date.today())
 
 
