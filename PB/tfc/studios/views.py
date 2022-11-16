@@ -9,7 +9,7 @@ from studios.serializers import StudioSerializer, AmenitySerializer, StudioImage
 from geopy import distance
 from rest_framework.response import Response
 from classes.models import ClassOffering, ClassInstance, TimeInterval
-from classes.serializers import ClassOfferingSerializer
+from classes.serializers import ClassOfferingSerializer, ClassInstanceSerializer
 from django.db.models import Q
 from datetime import *
 
@@ -116,39 +116,63 @@ class StudioMapsDirectionsView(APIView):
 
 
 class StudioClassListView(APIView, LimitOffsetPagination):
+    """
+    This returns a list of **all** ClassOfferings held by said studio, and sends a paginated
+    list of ClassInstances, sorted in ascending order by the date of the ClassInstance.
+    """
+
     permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get(self, request, studio_id):
         class_offerings = get_list_or_404(ClassOffering, studio_id=studio_id)
-
+        pg = request.GET.get("page")
         offerings_to_instances = []
 
         for c in class_offerings:
-            today = date.today()
-            right_now = time(5, 0, 0) # datetime.now().time() TODO: remove this later
+            today = datetime.now()
+            # print("THIS IS THE DATE RIGHT NOW: {0}".format(today))
 
-            cls = TimeInterval.objects.get(class_offering=c.id)
-            print(cls.start_time)
-            print(cls.start_time > right_now)
+            instances = ClassInstance.objects.filter(Q(class_offering=c.id) & Q(date__gte=today))
 
-            instances = ClassInstance.objects.filter(Q(class_offering=c.id) & Q(date__gt=today))
+            filtered_lst = []
 
-            # instances_after_right_now = instances.filter(class_offering__gt)
+            for i in instances:
+                combined_date = datetime.combine(i.date, i.time_interval.start_time)
 
+                if combined_date > today:
+                    serialized_inst = ClassInstanceSerializer(i)
+                    filtered_lst.append((serialized_inst.data, today))
 
-            # ClassInstance.objects.filter(date__gt=today)
-            # ClassInstance.objects.filter(Q(class_offering=c.id) & Q(date__gt=today))
-            # ClassInstance.objects.filter(class_offering=c.id)
+            filtered_lst.sort(key=lambda tup: tup[1])
 
-            # print(c)
-            print(instances)
+            sorted_lst = []
 
-            offerings_to_instances.append((c))
+            for t in filtered_lst:
+                sorted_lst.append(t[0])
 
-        # print(class_offerings)
+            serialized_class = ClassOfferingSerializer(c)
+            pag_sorted_lst = Paginator(sorted_lst, 5)
 
-        return Response(1)
+            offerings_to_instances.append((serialized_class.data, pag_sorted_lst))
+
+        class_lst = []
+
+        for o in offerings_to_instances:
+            curr = {"class_details": o[0]}
+
+            if pg is not None:
+                page_num = int(pg)
+
+                pag_class_lst = o[1].get_page(page_num).object_list
+
+                curr["class_instances"] = pag_class_lst
+            else:
+                curr["class_instances"] = o[1]
+
+            class_lst.append(curr)
+
+        return Response(class_lst)
 
 
 """
