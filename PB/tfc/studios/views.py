@@ -9,6 +9,8 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from classes.models import ClassOffering
+from django.http import JsonResponse
+
 """
     STUDIO
 
@@ -100,7 +102,7 @@ class StudioListFilterView(ListAPIView):
                 if c.studio not in studios:
                     studios += c.studio
 
-        return studios
+        return JsonResponse(studios)
 
 
 class StudioMapsDirectionsView(APIView):
