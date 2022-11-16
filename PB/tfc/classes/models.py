@@ -7,6 +7,8 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 import dateutil.relativedelta as rd
 import calendar
+from .exceptions import AlreadyEnrolledException, FullCapacityException
+from django.shortcuts import get_object_or_404
 
 # based on https://stackoverflow.com/questions/5966629/django-days-of-week-representation-in-model
 DAYS_OF_WEEK = (
@@ -70,6 +72,13 @@ class ClassOffering(models.Model):
         today = datetime.date.today()
         class_instances = self.classinstance_set.filter(date__gte=today)
         class_instances.delete()
+
+    def enroll_user(self, user_id):
+        """
+
+        Returns: True if user enrolled successfully, False if user enrollment failed (bc of capacity
+
+        """
 
 
 # https://stackoverflow.com/questions/1355150/when-saving-how-can-you-check-if-a-field-has-changed
@@ -157,6 +166,21 @@ class ClassInstance(models.Model):
 
     def __str__(self):
         return f"pk: {self.pk}, date: {self.date}, capacity: {self.capacity_count}"
+
+    def user_enrolled(self, user):
+        return self.userenroll_set.filter(user=user).exists()
+
+    def enroll_user(self, user):
+        if self.capacity_count == self.class_offering.capacity:
+            raise FullCapacityException
+        if self.user_enrolled(user):
+            raise AlreadyEnrolledException
+        # check if already enrolled
+        self.capacity_count += 1
+        user_enroll = UserEnroll.objects.create(class_instance=self,
+                                                class_offering=self.class_offering, user=user)
+        user_enroll.save()
+        self.save()
 
 
 class UserEnroll(models.Model):
