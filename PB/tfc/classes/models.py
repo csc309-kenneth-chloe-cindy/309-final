@@ -79,7 +79,7 @@ def handle_recursion_date_change(sender, instance, **kwargs):
         old_obj = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
         # Object is new, so we do nothing
-        pass
+        return
     if not old_obj.end_recursion_date == instance.end_recursion_date:
         # field has changed
         old_recursion_date = old_obj.end_recursion_date
