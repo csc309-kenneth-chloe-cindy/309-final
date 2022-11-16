@@ -95,33 +95,55 @@ class StudioListFilterView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = Studio.objects.all()
-        studio_name = self.request.query_params.get('studio_name')
-        amenity = self.request.query_params.get('amenity')
-        class_name = self.request.query_params.get('class_name')
-        coach = self.request.query_params.get('coach')
-        studios = []
-        if studio_name is not None:
-            queryset = queryset.filter(name=studio_name)
-            studios = queryset
-        if amenity is not None:
-            amenities = StudioAmenities.objects.filter(name=amenity)
-            for amenity in amenities:
-                if amenity.studio not in studios:
-                    studios += amenity.studio
-        if class_name is not None:
-            classes = ClassOffering.objects.filter(name=class_name)
-            for c in classes:
-                if c.studio not in studios:
-                    studios += c.studio
-        if coach is not None:
-            classes = ClassOffering.objects.filter(coach=coach)
-            for c in classes:
-                if c.studio not in studios:
-                    studios += c.studio
+        if 'studio_name' in self.request.data:
+            studio_name = self.request.data['studio_name']
+        else:
+            studio_name = None
+        
+        if 'amenity' in self.request.data:
+            amenity = self.request.data['amenity']
+        else:
+            amenity = None
 
+        if 'class_name' in self.request.data:
+            class_name = self.request.data['class_name']
+        else:
+            class_name = None
+            
+        if 'coach' in self.request.data:
+            coach = self.request.data['class_name']
+        else:
+            coach = None
 
-        return JsonResponse(studios)
+        studios = list(Studio.objects.all())
+        all_studios = list(Studio.objects.all())
+        for studio in all_studios:
+            if studio_name is not None:
+                if studio.name != studio_name:
+                    studios.remove(studio)
+                
+            if amenity is not None:
+                a = StudioAmenities.objects.filter(studio=studio)
+                if a.name != amenity:
+                    studios.remove(studio)
+            
+            if class_name is not None:
+                classes = ClassOffering.objects.filter(studio=studio)
+                if classes.name != class_name:
+                    studios.remove(studio)
+
+            if coach is not None:
+                classes = ClassOffering.objects.filter(studio=studio)
+                if classes.coach != coach:
+                    studios.remove(studio)
+        
+        paginated_studio_list = self.paginate_queryset(studios)
+        studios_serializer = StudioSerializer(paginated_studio_list, many=True)
+        response_data = {"studio_list": studios_serializer.data}
+        try:
+            return self.get_paginated_response(response_data)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class StudioMapsDirectionsView(APIView):
