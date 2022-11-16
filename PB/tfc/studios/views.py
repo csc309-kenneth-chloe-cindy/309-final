@@ -6,7 +6,9 @@ from django.shortcuts import get_object_or_404
 from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
 from geopy import distance
 from rest_framework.response import Response
-
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
+from classes.models import ClassOffering
 """
     STUDIO
 
@@ -39,7 +41,7 @@ class DeleteStudioView(DestroyAPIView):
 
 class StudioListView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     """
     Gets a list of studios that are sorted to closest -> furthest from the lat/long passed in
     from the frontend.
@@ -67,6 +69,38 @@ class StudioListView(APIView):
         # print(studios)
 
         return Response(studios)
+    
+class StudioListFilterView(ListAPIView):
+    serializer_class = StudioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Studio.objects.all()
+        studio_name = self.request.query_params.get('studio_name')
+        amenity = self.request.query_params.get('amenity')
+        class_name = self.request.query_params.get('class_name')
+        coach = self.request.query_params.get('coach')
+        studios = []
+        if studio_name is not None:
+            queryset = queryset.filter(name=studio_name)
+            studios = queryset
+        if amenity is not None:
+            amenities = StudioAmenities.objects.filter(name=amenity)
+            for amenity in amenities:
+                if amenity.studio not in studios:
+                    studios += amenity.studio
+        if class_name is not None:
+            classes = ClassOffering.objects.filter(name=class_name)
+            for c in classes:
+                if c.studio not in studios:
+                    studios += c.studio
+        if coach is not None:
+            classes = ClassOffering.objects.filter(coach=coach)
+            for c in classes:
+                if c.studio not in studios:
+                    studios += c.studio
+
+        return studios
 
 
 class StudioMapsDirectionsView(APIView):
