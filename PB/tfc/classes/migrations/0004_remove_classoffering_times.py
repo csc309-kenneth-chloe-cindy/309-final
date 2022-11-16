@@ -4,9 +4,8 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('class', '0003_alter_timeinterval_day'),
+        ('classes', '0003_alter_timeinterval_day'),
     ]
 
     operations = [
