@@ -3,3 +3,5 @@ from .models import SubscriptionPlan, Subscription, PaymentHistory, PaymentMetho
 
 # Register your models here.
 admin.site.register(SubscriptionPlan)
+
+
