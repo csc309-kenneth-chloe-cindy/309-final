@@ -67,6 +67,7 @@ class ClassOffering(models.Model):
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
 
 
+
     def delete_future_instances(self):
         today = datetime.date.today()
         class_instances = self.classinstance_set.filter(date__gte=today)
@@ -90,12 +91,12 @@ class TimeInterval(models.Model):
             next_class_date += rd.relativedelta(days=7)
         ClassInstance.objects.bulk_create(class_instances)
 
+    def save(self, *args, **kwargs):
+        self.generate_future_class_instances(datetime.date.today())
+        super().save(*args, **kwargs)
+
 
 # https://stackoverflow.com/questions/13014411/django-post-save-signal-implementation
-
-@receiver(post_save, sender=TimeInterval)
-def create_instances(sender, instance, **kwargs):
-    instance.generate_future_class_instances(datetime.date.today())
 
 
 class Keyword(models.Model):
@@ -116,3 +117,16 @@ class UserEnroll(models.Model):
     class_instance = models.ForeignKey(to=ClassInstance, on_delete=CASCADE)
     class_offering = models.ForeignKey(to=ClassOffering, on_delete=CASCADE)
     user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)
+
+    def unenroll(self):
+        """
+
+        Returns: True if successfully unenrolled, false if the capacity is already at 0
+
+        """
+
+        if self.class_offering.capacity == 0:
+            return False
+        self.class_instance.capacity -= 1
+        self.class_instance.save()
+        self.delete()
