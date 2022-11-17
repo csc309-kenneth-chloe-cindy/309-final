@@ -75,8 +75,24 @@ class ClassOffering(models.Model):
         class_instances = self.classinstance_set.filter(date__gte=today)
         class_instances.delete()
 
+    def unenroll_user(self, user):
+        if not has_active_subscription(user.id):
+            raise NotSubscribedException
+        enrolled_classes = []
+        # future occurrences
+        today = datetime.date.today()
+        future_class_instances = self.classinstance_set.filter(date__gte=today)
+        num_deleted = 0
+        for class_instance in future_class_instances:
+            try:
+                enrolled_class = class_instance.unenroll_user(user)
+                num_deleted += 1
+            except Exception:
+                # ignore these
+                pass
+        return num_deleted
+
     def enroll_user(self, user):
-        # check for subscription
         if not has_active_subscription(user.id):
             raise NotSubscribedException
         enrolled_classes = []

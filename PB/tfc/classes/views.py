@@ -10,6 +10,22 @@ from .exceptions import EnrollmentException, CapacityException, NotSubscribedExc
 from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
 
 
+class UnenrollFuture(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        class_offering = get_object_or_404(ClassOffering, pk=kwargs['class_id'])
+        num_deleted = 0
+        try:
+            num_deleted = class_offering.unenroll_user(user)
+        except (NotSubscribedException):
+            return Response({"Message": "User is not subscribed"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        return Response({"Message": f"Unenrolled in {num_deleted} classes"},
+                        status=status.HTTP_200_OK)
+
+
 class UnenrollSingle(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -46,9 +62,6 @@ class EnrollFuture(APIView):
         except (NotSubscribedException):
             return Response({"Message": "User is not subscribed"},
                             status=status.HTTP_400_BAD_REQUEST)
-        except (TargetInPastException):
-            return Response({"Message": "Enrollment target is in the past"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({"Message": f"Enrolled in {len(enrolled_classes)} classes"},
                         status=status.HTTP_200_OK)
 
