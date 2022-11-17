@@ -9,6 +9,7 @@ app_name = 'studios'
 urlpatterns = [
     path('list/', StudioListView.as_view()),
     path('list/filter/', StudioListFilterView.as_view()),
+    path('<studio_id>/classes/list/', StudioClassListView.as_view()),
     path('<studio_id>/', RetrieveStudioView.as_view()),
     path('<studio_id>/amenities/list/', RetrieveAmenitiesView.as_view()),
     path('<studio_id>/images/list/', RetrieveStudioImageView.as_view()),
