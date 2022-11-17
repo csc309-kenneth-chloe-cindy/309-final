@@ -12,7 +12,7 @@ from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
 
 class UnenrollFuture(APIView):
     """
-    Unenrolls a user from all future instances of a class, pointed to by <class_id>.
+    Unenrolls a user from all future instances of a class, pointed to by `class_id`.
     """
 
     permission_classes = [IsAuthenticated]

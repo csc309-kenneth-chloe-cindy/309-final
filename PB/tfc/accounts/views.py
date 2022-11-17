@@ -15,6 +15,12 @@ from datetime import *
 
 # This takes a POST request.
 class CreateUserView(CreateAPIView):
+    """
+    Registers a new user.
+
+    The form data must include:
+        `username`, `password`, `email`, `first_name`, `last_name`, `phone_number`, `avatar` - an Image
+    """
     serializer_class = TFCUserSerializer
 
 
@@ -23,6 +29,9 @@ class CreateUserView(CreateAPIView):
 class UpdateUserProfileView(UpdateAPIView):
     """
     Updates the user's profile with user id `user_id`.
+
+    The payload data can include:
+        `username`, `password`, `email`, `first_name`, `last_name`, `phone_number`, `avatar` - an Image
     """
     permission_classes = [IsAuthenticated]
     serializer_class = TFCUserSerializer
