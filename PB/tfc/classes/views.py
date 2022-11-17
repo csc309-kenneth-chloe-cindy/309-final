@@ -36,7 +36,7 @@ class UnenrollFuture(APIView):
 
 class UnenrollSingle(APIView):
     """
-    Unenrolls a user from one instance of a class, pointed to by <class_id>.
+    Unenrolls a user from one instance of a class, pointed to by `class_id`.
     """
     permission_classes = [IsAuthenticated]
 
@@ -67,14 +67,14 @@ class UnenrollSingle(APIView):
 # Create your views here.
 class EnrollFuture(APIView):
     """
-    Enrolls a user to all future instances of a class, pointed to by <class_id>.
+    Enrolls a user to all future instances of a class, pointed to by `class_id`.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         """
         post:
-        Enrolls a user to all future instances of a class, pointed to by <class_id>.
+        Enrolls a user to all future instances of a class, pointed to by `class_id`.
         """
         user = request.user
         class_offering = get_object_or_404(ClassOffering, pk=kwargs['class_id'])
@@ -90,14 +90,14 @@ class EnrollFuture(APIView):
 
 class EnrollSingleInstance(APIView):
     """
-    Enrolls a user to one instances of a class, pointed to by <class_id>.
+    Enrolls a user to one instances of a class, pointed to by `class_id`.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         """
         post:
-        Enrolls a user to one instances of a class, pointed to by <class_id>.
+        Enrolls a user to one instances of a class, pointed to by `class_id`.
         """
         user = request.user
         class_instance = get_object_or_404(ClassInstance, pk=kwargs['class_id'])
