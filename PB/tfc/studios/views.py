@@ -1,5 +1,4 @@
 from django.core.paginator import Paginator
-from django.db.models import Q
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
@@ -7,8 +6,6 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from studios.models import Studio, StudioImage, StudioAmenities
 from django.shortcuts import get_object_or_404, get_list_or_404
 from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
-from classes.models import ClassOffering
-from classes.serializers import ClassOfferingSerializer
 from geopy import distance
 from rest_framework.response import Response
 from classes.models import ClassOffering, ClassInstance, TimeInterval
@@ -29,6 +26,9 @@ class CreateStudioView(CreateAPIView):
 
 
 class RetrieveStudioView(RetrieveAPIView):
+    """
+    Retrieves a studio with the id `studio_id`.
+    """
     serializer_class = StudioSerializer
     permission_classes = [IsAuthenticated]
 
@@ -47,13 +47,21 @@ class DeleteStudioView(DestroyAPIView):
 
 
 class StudioListView(APIView, LimitOffsetPagination):
+    """
+    Retrieves a list of studios that are sorted to closest -> furthest from the lat/long passed in
+    from the frontend.
+
+    Sample payload:
+        ```{
+        "latitude": "43.65792466303926",
+        "longitude": "-79.39900559414212"
+        }```
+
+    Params:
+        `?page=` - Specifies the page # of the list of studios.
+    """
     permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
-
-    """
-    Gets a list of studios that are sorted to closest -> furthest from the lat/long passed in
-    from the frontend.
-    """
 
     def get(self, request):
         studio_list = Studio.objects.all()
@@ -95,8 +103,18 @@ class StudioListView(APIView, LimitOffsetPagination):
 
 class StudioListFilterView(APIView):
     """
+    Returns a list of studios, filtered by the filter choices below:
+
     Filter choices are:
-    address, amenities, classoffering, id, latitude, longitude, name, phone_num, postal_code, studio_images
+        `name` of the Studio, `amenities`, `class_offering_name`, `coach_name`
+
+    Sample payload:
+        `{
+            "amenities": ["Pool", "Gym"],
+            "name": "Pythonic Fitness Studio",
+            "class_offering_name": "Pilates",
+            "coach_name": "Mr. B"
+        }`
     """
     serializer_class = StudioSerializer
     permission_classes = [IsAuthenticated]
@@ -147,9 +165,19 @@ class StudioListFilterView(APIView):
 
 class StudioListFilterClassesView(APIView):
     """
+    Returns a list of classes offered by Studio with `studio_id`, filtered by the filter choices below:
+
     Filter choices are:
-    capacity, classinstance, coach, description, end_recursion_date, id, keyword, name, studio,
-    studio_id, timeinterval, userenroll
+        `class_name`, `coach_name`, `date`, `start_time`, `end_time`
+
+    Sample payload:
+        ```{
+            "date": "2",
+            "class_name": "Pilates",
+            "coach_name": "Mr. B",
+            "start_time": "6:00",
+            "end_time": "7:00"
+        }```
     """
     serializer_class = ClassOfferingSerializer
     permission_classes = [IsAuthenticated]
@@ -199,14 +227,13 @@ class StudioListFilterClassesView(APIView):
 
 
 class StudioMapsDirectionsView(APIView):
-    permission_classes = [IsAuthenticated]
+    """
+    Returns a Google Maps link that has the destination set to the studio specified by `studio_id`.
 
+    Example Output: `https://www.google.com/maps/dir/?api=1&destination=43.661430,-79.397000`
     """
-    Returns a Google Maps link that has the destination set to the studio specified.
-    
-    Example: https://www.google.com/maps/dir/?api=1&origin=43.662625,-79.398640&destination=43.661430,-79.397000
-    Example 2: https://www.google.com/maps/dir/?api=1&destination=43.661430,-79.397000
-    """
+
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, studio_id):
         link_base = "https://www.google.com/maps/dir/?api=1&destination="
@@ -218,15 +245,17 @@ class StudioMapsDirectionsView(APIView):
 
         link_base = link_base + str(studio_lat) + "," + str(studio_long)
 
-        # print(link_base)
-
         return Response(link_base)
 
 
 class StudioClassListView(APIView, LimitOffsetPagination):
     """
-    This returns a list of **all** ClassOfferings held by said studio, and sends a paginated
-    list of ClassInstances, sorted in ascending order by the date of the ClassInstance.
+    Returns a list of all ClassOfferings held by studio with `studio_id`, and sends a paginated
+    list of ClassInstances associated with the ClassOfferings, sorted in ascending order by the
+    date of the ClassInstance.
+
+    Params:
+        `?page=` - Specifies the page # of the list of classes.
     """
 
     permission_classes = [IsAuthenticated]
@@ -296,6 +325,12 @@ class CreateStudioImageView(CreateAPIView):
 
 
 class RetrieveStudioImageView(ListAPIView, LimitOffsetPagination):
+    """
+    Returns a list of all images under the Studio with `studio_id`
+
+    Params:
+        `?page=` - Specifies the page # of the list of studio images.
+    """
     serializer_class = StudioImageSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
@@ -319,6 +354,12 @@ class CreateAmenityView(CreateAPIView):
 
 
 class RetrieveAmenitiesView(ListAPIView, LimitOffsetPagination):
+    """
+    Returns a list of all amenities offered by studio with `studio_id`.
+
+    Params:
+        `?page=` - Specifies the page # of the list of amenities.
+    """
     serializer_class = AmenitySerializer
     permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
