@@ -21,7 +21,7 @@ def cancel_user_subscription(user):
             class_instance.unenroll_user(user)
         except Exception as error:
             print(error)
-    return subscription.delete()
+    return subscription.payment_method.delete()
 
 
 # Create your views here.
