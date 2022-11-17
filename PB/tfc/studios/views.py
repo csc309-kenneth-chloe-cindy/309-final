@@ -1,4 +1,6 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
+from rest_framework import status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
@@ -90,60 +92,46 @@ class StudioListView(APIView, LimitOffsetPagination):
             return Response(studios)
 
 
-class StudioListFilterView(ListAPIView):
+class StudioListFilterView(APIView):
+    """
+    Filter choices are:
+    address, amenities, classoffering, id, latitude, longitude, name, phone_num, postal_code, studio_images
+    """
     serializer_class = StudioSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        if 'studio_name' in self.request.data:
-            studio_name = self.request.data['studio_name']
-        else:
-            studio_name = None
-        
-        if 'amenity' in self.request.data:
-            amenity = self.request.data['amenity']
-        else:
-            amenity = None
+    def get(self, request):
+        raw_filters = request.data
 
-        if 'class_name' in self.request.data:
-            class_name = self.request.data['class_name']
-        else:
-            class_name = None
-            
-        if 'coach' in self.request.data:
-            coach = self.request.data['class_name']
-        else:
-            coach = None
+        filters = {}
 
-        studios = list(Studio.objects.all())
-        all_studios = list(Studio.objects.all())
-        for studio in all_studios:
-            if studio_name is not None:
-                if studio.name != studio_name:
-                    studios.remove(studio)
-                
-            if amenity is not None:
-                a = StudioAmenities.objects.filter(studio=studio)
-                if a.name != amenity:
-                    studios.remove(studio)
-            
-            if class_name is not None:
-                classes = ClassOffering.objects.filter(studio=studio)
-                if classes.name != class_name:
-                    studios.remove(studio)
+        amen_lst = []
 
-            if coach is not None:
-                classes = ClassOffering.objects.filter(studio=studio)
-                if classes.coach != coach:
-                    studios.remove(studio)
-        
-        paginated_studio_list = self.paginate_queryset(studios)
-        studios_serializer = StudioSerializer(paginated_studio_list, many=True)
-        response_data = {"studio_list": studios_serializer.data}
-        try:
-            return self.get_paginated_response(response_data)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        for k in raw_filters:
+            if k == "name":
+                filters["name"] = raw_filters[k]
+
+            if k == "class_offering_name":
+                filters["classoffering__name"] = raw_filters[k]
+
+            if k == "coach_name":
+                filters["classoffering__coach"] = raw_filters[k]
+
+            if k == "amenities":
+                amen_lst = raw_filters[k]
+
+        filtered_lst = Studio.objects.filter(**filters)
+
+        if amen_lst:
+            for x in amen_lst:
+                filtered_lst = filtered_lst.filter(Q(amenities__name=x)).distinct()
+                # Keep on filtering based on the amenities
+
+        print(filtered_lst)
+
+        serialized_lst = [StudioSerializer(i).data for i in filtered_lst]
+
+        return Response(serialized_lst)
 
 
 class StudioMapsDirectionsView(APIView):
