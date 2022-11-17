@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 # from studios.views import StudioListView, CreateStudioView, EditStudioView, DeleteStudioView, RetrieveStudioView
-from .views import StudioListView, RetrieveStudioView, RetrieveAmenitiesView, RetrieveStudioImageView, StudioMapsDirectionsView, StudioListFilterView, StudioListFilterClassesView
+from .views import StudioListView, RetrieveStudioView, RetrieveAmenitiesView, RetrieveStudioImageView, StudioMapsDirectionsView, StudioListFilterView, StudioListFilterClassesView, StudioClassListView
 # CreateStudioView, EditStudioView, DeleteStudioView, CreateAmenityView
 
 app_name = 'studios'
