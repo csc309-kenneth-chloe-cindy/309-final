@@ -36,13 +36,18 @@ class RetrieveClassScheduleView(APIView):
 
         schedule = list(set([o.class_offering for o in filtered_lst]))
 
-        print(schedule)
+        schedule_sorted = []
 
-        serialized_lst = [ClassOfferingSerializer(c).data for c in schedule]
+        for s in schedule:
+            time_interval = TimeInterval.objects.get(class_offering=s)
 
+            schedule_sorted.append((s, time_interval.day, time_interval.start_time))
 
+        schedule_sorted.sort(key=lambda tup: (tup[1], tup[2]))
 
-        page_class_lst = Paginator(serialized_lst, 10)
+        serialized_lst = [ClassOfferingSerializer(c[0]).data for c in schedule_sorted]
+
+        page_class_lst = Paginator(serialized_lst, 1)
 
         pg = request.GET.get("page")
 
