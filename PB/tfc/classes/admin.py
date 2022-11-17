@@ -41,5 +41,5 @@ class ClassInstanceAdmin(admin.ModelAdmin):
 admin.site.register(ClassOffering, ClassOfferingAdmin)
 admin.site.register(ClassInstance, ClassInstanceAdmin)
 
-# TESTING
+# TODO: remove b/c this is TESTING
 admin.site.register(UserEnroll)
