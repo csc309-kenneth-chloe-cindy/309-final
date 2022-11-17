@@ -8,7 +8,7 @@ app_name = 'accounts'
 urlpatterns = [
     path('register/', CreateUserView.as_view()),
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('<int:user_id>/update/', UpdateUserProfileView.as_view()),
+    path('update/', UpdateUserProfileView.as_view()),
     path('<int:user_id>/schedule/', RetrieveClassScheduleView.as_view()),
     path('<int:user_id>/history/', RetrieveClassHistoryView.as_view()),
 ]

@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,10 +22,13 @@ class CreateUserView(CreateAPIView):
 # Use PUT when you are updating *all* fields of the user profile.
 # Use PATCH when updating *one* field of the user profile.
 class UpdateUserProfileView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = TFCUserSerializer
 
     def get_object(self):
-        return get_object_or_404(TFCUser, id=self.kwargs['user_id'])
+        curr = self.request.user
+
+        return get_object_or_404(TFCUser, id=curr.id)
 
 
 class RetrieveClassScheduleView(APIView):
