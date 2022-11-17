@@ -111,6 +111,7 @@ class SubscriptionDetail(APIView):
         return get_object_or_404(Subscription, pk=pk)
 
     def post(self, request, *args, **kwargs):
+        #TODO: restrict it so only one subscription per user. Maybe one to one relation
         subscription_serializer = SubscriptionSerializer(data=request.data,
                                                          context={'user': request.user})
         if subscription_serializer.is_valid():
