@@ -28,6 +28,9 @@ def cancel_user_subscription(user):
 
 
 class UpdatePaymentMethodView(UpdateAPIView):
+    """
+    Updates a payment method that is owned by user with id `user_id`.
+    """
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsAuthenticated]
 
@@ -36,6 +39,12 @@ class UpdatePaymentMethodView(UpdateAPIView):
 
 
 class GetPaymentHistory(APIView, LimitOffsetPagination):
+    """
+    Retrieve payment history and future payment for the current user
+
+    Params:
+        `?limit=` - specifies limit per page of the list of payments
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -60,17 +69,16 @@ class GetPaymentHistory(APIView, LimitOffsetPagination):
 
 
 class SubscriptionDetail(APIView):
+    """
+    Create, Update and Delete a user's unique Subscription.
+
+    """
     permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         return get_object_or_404(Subscription, pk=pk)
 
     def patch(self, request, *args, **kwargs):
-        """
-        only allows patch of subscription type
-
-
-        """
         orig_subscription = get_object_or_404(Subscription, user=request.user)
         new_subscription_type_id = request.data["subscription_type_id"]
         altered_subscription = orig_subscription.change_subscription_type(new_subscription_type_id)
