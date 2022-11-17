@@ -7,7 +7,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 import dateutil.relativedelta as rd
 import calendar
-from .exceptions import AlreadyEnrolledException, FullCapacityException, NotSubscribedException, \
+from .exceptions import EnrollmentException, CapacityException, NotSubscribedException, \
     TargetInPastException
 from subscriptions.models import has_active_subscription
 from django.shortcuts import get_object_or_404
@@ -182,6 +182,20 @@ class ClassInstance(models.Model):
     def user_enrolled(self, user):
         return self.userenroll_set.filter(user=user).exists()
 
+    def unenroll_user(self, user):
+        if self.date <= datetime.date.today():
+            raise TargetInPastException
+        if not has_active_subscription(user.id):
+            raise NotSubscribedException
+        if not self.user_enrolled(user):
+            raise EnrollmentException
+        if self.capacity_count == 0:
+            raise CapacityException
+        self.capacity_count -= 1
+        user_enrollment = get_object_or_404(UserEnroll, class_instance=self, user=user)
+        user_enrollment.delete()
+        self.save()
+
     def enroll_user(self, user):
         # check that it is in the future
         if self.date <= datetime.date.today():
@@ -190,9 +204,9 @@ class ClassInstance(models.Model):
         if not has_active_subscription(user.id):
             raise NotSubscribedException
         if self.capacity_count == self.class_offering.capacity:
-            raise FullCapacityException
+            raise CapacityException
         if self.user_enrolled(user):
-            raise AlreadyEnrolledException
+            raise EnrollmentException
         self.capacity_count += 1
         user_enroll = UserEnroll.objects.create(class_instance=self,
                                                 class_offering=self.class_offering, user=user)

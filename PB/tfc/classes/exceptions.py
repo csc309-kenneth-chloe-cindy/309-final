@@ -1,8 +1,8 @@
-class FullCapacityException(Exception):
+class CapacityException(Exception):
     pass
 
 
-class AlreadyEnrolledException(Exception):
+class EnrollmentException(Exception):
     pass
 
 

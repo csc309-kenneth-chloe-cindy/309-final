@@ -4,10 +4,33 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import ClassInstance, ClassOffering
 from rest_framework.response import Response
-from .exceptions import AlreadyEnrolledException, FullCapacityException, NotSubscribedException, \
+from .exceptions import EnrollmentException, CapacityException, NotSubscribedException, \
     TargetInPastException
 
 from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
+
+
+class UnenrollSingle(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        class_instance = get_object_or_404(ClassInstance, pk=kwargs['class_id'])
+        try:
+            class_instance.unenroll_user(user)
+        except (TargetInPastException):
+            return Response({"Message": "Unenrollment target is in the past"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except (NotSubscribedException):
+            return Response({"Message": "User is not subscribed"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except (CapacityException):
+            return Response({"Message": "Class is already empty"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except (EnrollmentException):
+            return Response({"Message": "User already unenrolled"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Create your views here.
@@ -45,10 +68,10 @@ class EnrollSingleInstance(APIView):
         except (NotSubscribedException):
             return Response({"Message": "User is not subscribed"},
                             status=status.HTTP_400_BAD_REQUEST)
-        except (FullCapacityException):
+        except (CapacityException):
             return Response({"Message": "Class at full capacity"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except (AlreadyEnrolledException):
+        except (EnrollmentException):
             return Response({"Message": "User already enrolled"},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         serializer = ClassInstanceSerializer(ret)
