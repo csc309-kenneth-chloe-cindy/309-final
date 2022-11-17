@@ -4,4 +4,5 @@ from .models import SubscriptionPlan, Subscription, PaymentHistory, PaymentMetho
 # Register your models here.
 admin.site.register(SubscriptionPlan)
 
-
+# TODO: remove after done with TESTING
+admin.site.register(Subscription)
