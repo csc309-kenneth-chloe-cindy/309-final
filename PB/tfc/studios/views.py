@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
@@ -6,6 +7,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from studios.models import Studio, StudioImage, StudioAmenities
 from django.shortcuts import get_object_or_404, get_list_or_404
 from studios.serializers import StudioSerializer, AmenitySerializer, StudioImageSerializer
+from classes.models import ClassOffering
+from classes.serializers import ClassOfferingSerializer
 from geopy import distance
 from rest_framework.response import Response
 from classes.models import ClassOffering, ClassInstance, TimeInterval
@@ -88,6 +91,111 @@ class StudioListView(APIView, LimitOffsetPagination):
         else:
             # Defaults to returning the whole list of studios if no page is given.
             return Response(studios)
+
+
+class StudioListFilterView(APIView):
+    """
+    Filter choices are:
+    address, amenities, classoffering, id, latitude, longitude, name, phone_num, postal_code, studio_images
+    """
+    serializer_class = StudioSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        raw_filters = request.data
+
+        filters = {}
+
+        amen_lst = []
+
+        for k in raw_filters:
+            if k == "name":
+                filters["name"] = raw_filters[k]
+
+            if k == "class_offering_name":
+                filters["classoffering__name"] = raw_filters[k]
+
+            if k == "coach_name":
+                filters["classoffering__coach"] = raw_filters[k]
+
+            if k == "amenities":
+                amen_lst = raw_filters[k]
+
+        filtered_lst = Studio.objects.filter(**filters)
+
+        if amen_lst:
+            for x in amen_lst:
+                filtered_lst = filtered_lst.filter(Q(amenities__name=x)).distinct()
+                # Keep on filtering based on the amenities
+
+        serialized_lst = [StudioSerializer(i).data for i in filtered_lst]
+
+        page_studio_lst = Paginator(serialized_lst, 10)
+
+        pg = request.GET.get("page")
+
+        if pg is not None:
+            page_num = int(pg)
+
+            # If you have only 2 pages, but the query param sends in page=3,
+            # it will just return the last page (page 2)
+            return Response(page_studio_lst.get_page(page_num).object_list)
+        else:
+            # Defaults to returning the whole list of studios if no page is given.
+            return Response(serialized_lst)
+
+
+class StudioListFilterClassesView(APIView):
+    """
+    Filter choices are:
+    capacity, classinstance, coach, description, end_recursion_date, id, keyword, name, studio,
+    studio_id, timeinterval, userenroll
+    """
+    serializer_class = ClassOfferingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, studio_id):
+        raw_filters = request.data
+
+        filters = {"studio": studio_id}
+
+        for k in raw_filters:
+            if k == "class_name":
+                filters["name"] = raw_filters[k]
+
+            if k == "coach_name":
+                filters["coach"] = raw_filters[k]
+
+            if k == "date":
+                filters["timeinterval__day"] = raw_filters[k]
+
+            if k == "start_time":
+                formatted_time = datetime.strptime(raw_filters[k], '%H:%M').time()
+
+                filters["timeinterval__start_time"] = formatted_time
+
+            if k == "end_time":
+                formatted_time = datetime.strptime(raw_filters[k], '%H:%M').time()
+
+                filters["timeinterval__end_time"] = formatted_time
+
+        filtered_lst = ClassOffering.objects.filter(**filters)
+
+        serialized_lst = [ClassOfferingSerializer(i).data for i in filtered_lst]
+
+        page_class_lst = Paginator(serialized_lst, 10)
+
+        pg = request.GET.get("page")
+
+        if pg is not None:
+            page_num = int(pg)
+
+            # If you have only 2 pages, but the query param sends in page=3,
+            # it will just return the last page (page 2)
+            return Response(page_class_lst.get_page(page_num).object_list)
+        else:
+            # Defaults to returning the whole list of studios if no page is given.
+            return Response(serialized_lst)
 
 
 class StudioMapsDirectionsView(APIView):
