@@ -46,3 +46,7 @@ class Subscription(models.Model):
     # add user
     user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)
     next_payment_date = models.DateField()
+
+
+def has_active_subscription(user_id):
+    return Subscription.objects.filter(user=user_id).exists()
