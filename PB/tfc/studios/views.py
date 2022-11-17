@@ -142,7 +142,7 @@ class StudioClassListView(APIView, LimitOffsetPagination):
 
                 if combined_date > today:
                     serialized_inst = ClassInstanceSerializer(i)
-                    filtered_lst.append((serialized_inst.data, today))
+                    filtered_lst.append((serialized_inst.data, combined_date))
 
             filtered_lst.sort(key=lambda tup: tup[1])
 
