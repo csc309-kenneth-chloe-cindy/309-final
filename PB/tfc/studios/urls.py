@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 # from studios.views import StudioListView, CreateStudioView, EditStudioView, DeleteStudioView, RetrieveStudioView
-from .views import StudioListView, RetrieveStudioView, RetrieveAmenitiesView, RetrieveStudioImageView, StudioMapsDirectionsView, StudioListFilterView
+from .views import StudioListView, RetrieveStudioView, RetrieveAmenitiesView, RetrieveStudioImageView, StudioMapsDirectionsView, StudioListFilterView, StudioListFilterClassesView
 # CreateStudioView, EditStudioView, DeleteStudioView, CreateAmenityView
 
 app_name = 'studios'
@@ -12,6 +12,7 @@ urlpatterns = [
     path('<studio_id>/', RetrieveStudioView.as_view()),
     path('<studio_id>/amenities/list/', RetrieveAmenitiesView.as_view()),
     path('<studio_id>/images/list/', RetrieveStudioImageView.as_view()),
+    path('<studio_id>/classes/filter/', StudioListFilterClassesView.as_view()),
     path('<studio_id>/directions/', StudioMapsDirectionsView.as_view()),
 
     # Below are depreciated URLs

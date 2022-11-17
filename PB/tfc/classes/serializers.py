@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from studios.serializers import StudioSerializer
+from classes.models import ClassOffering
 
 
 class ClassOfferingSerializer(serializers.ModelSerializer):
@@ -9,3 +10,4 @@ class ClassOfferingSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ["name", "description", "coach", "capacity", "end_recursion_date", "studio",
                   "studio_id"]
+        model = ClassOffering
