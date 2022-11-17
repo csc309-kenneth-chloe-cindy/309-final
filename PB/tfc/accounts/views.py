@@ -16,12 +16,25 @@ from datetime import *
 
 # This takes a POST request.
 class CreateUserView(CreateAPIView):
+    """
+    Registers a new user.
+
+    The form data must include:
+        `username`, `password`, `email`, `first_name`, `last_name`, `phone_number`, `avatar` - an Image
+    """
     serializer_class = TFCUserSerializer
 
 
 # Use PUT when you are updating *all* fields of the user profile.
 # Use PATCH when updating *one* field of the user profile.
 class UpdateUserProfileView(UpdateAPIView):
+    """
+    Updates the user's profile with user id `user_id`.
+
+    The payload data can include:
+        `username`, `password`, `email`, `first_name`, `last_name`, `phone_number`, `avatar` - an Image
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = TFCUserSerializer
 
@@ -32,6 +45,12 @@ class UpdateUserProfileView(UpdateAPIView):
 
 
 class RetrieveClassScheduleView(APIView):
+    """
+    Returns a list of ClassOfferings that the user is enrolled in.
+
+    Params:
+        `?page=` - Specifies the page # of the class schedule list.
+    """
     serializer_class = ClassOfferingSerializer
     permission_classes = [IsAuthenticated]
 
@@ -67,6 +86,12 @@ class RetrieveClassScheduleView(APIView):
 
 
 class RetrieveClassHistoryView(APIView):
+    """
+    Returns a list of ClassInstances that the user with `user_id` has attended in the past.
+
+    Params:
+        `?page=` - Specifies the page # of the class history list.
+    """
     serializer_class = ClassInstanceSerializer
     permission_classes = [IsAuthenticated]
 

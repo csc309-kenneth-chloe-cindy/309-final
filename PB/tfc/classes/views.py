@@ -11,6 +11,10 @@ from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
 
 
 class UnenrollFuture(APIView):
+    """
+    Unenrolls a user from all future instances of a class, pointed to by `class_id`.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -27,6 +31,9 @@ class UnenrollFuture(APIView):
 
 
 class UnenrollSingle(APIView):
+    """
+    Unenrolls a user from one instance of a class, pointed to by `class_id`.
+    """
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
@@ -51,6 +58,9 @@ class UnenrollSingle(APIView):
 
 # Create your views here.
 class EnrollFuture(APIView):
+    """
+    Enrolls a user to all future instances of a class, pointed to by `class_id`.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -67,6 +77,9 @@ class EnrollFuture(APIView):
 
 
 class EnrollSingleInstance(APIView):
+    """
+    Enrolls a user to one instances of a class, pointed to by `class_id`.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
