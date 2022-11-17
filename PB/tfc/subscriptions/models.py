@@ -1,19 +1,24 @@
 from django.db import models
 from django.db.models import CASCADE
 from accounts.models import TFCUser
+import datetime
+import dateutil.relativedelta as rd
 
 # # Create your models here.
+YEARLY = "Yearly"
+MONTHLY = "Monthly"
+
 MODEL_TYPES = (
-    (0, "Yearly"),
-    (1, "Monthly")
+    (0, YEARLY),
+    (1, MONTHLY)
 )
 
 
 def get_period(num):
     if num == 0:
-        return "Yearly"
+        return YEARLY
     else:
-        return "Monthly"
+        return MONTHLY
 
 
 class SubscriptionPlan(models.Model):
@@ -47,6 +52,22 @@ class Subscription(models.Model):
     user = models.ForeignKey(to=TFCUser, on_delete=CASCADE)
     next_payment_date = models.DateField()
 
+    def payment_due_today(self):
+        return datetime.date.today() == self.next_payment_date
+    def get_next_payment_date_from_date(self, date):
+        period = get_period(self.subscription_type.period)
+        if period == YEARLY:
+            return date + rd.relativedelta(years=1)
+        elif period == MONTHLY:
+            return date + rd.relativedelta(months=1)
+        return None
+    def make_payment(self):
+        today = datetime.date.today()
+        payment_amount = self.subscription_type.price
+        payment_history = PaymentHistory.objects.create(amount = payment_amount, payment_method = self.payment_method)
+        payment_history.save()
+        self.next_payment_date = self.get_next_payment_date_from_date(today)
+        self.save()
 
 def has_active_subscription(user_id):
     return Subscription.objects.filter(user=user_id).exists()
