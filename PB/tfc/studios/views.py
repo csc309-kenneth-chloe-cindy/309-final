@@ -171,13 +171,13 @@ class StudioListFilterClassesView(APIView):
         `class_name`, `coach_name`, `date`, `start_time`, `end_time`
 
     Sample payload:
-        {
+        ```{
             "date": "2",
             "class_name": "Pilates",
             "coach_name": "Mr. B",
             "start_time": "6:00",
             "end_time": "7:00"
-        }
+        }```
     """
     serializer_class = ClassOfferingSerializer
     permission_classes = [IsAuthenticated]
