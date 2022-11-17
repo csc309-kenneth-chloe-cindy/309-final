@@ -127,11 +127,21 @@ class StudioListFilterView(APIView):
                 filtered_lst = filtered_lst.filter(Q(amenities__name=x)).distinct()
                 # Keep on filtering based on the amenities
 
-        print(filtered_lst)
-
         serialized_lst = [StudioSerializer(i).data for i in filtered_lst]
 
-        return Response(serialized_lst)
+        page_studio_lst = Paginator(serialized_lst, 10)
+
+        pg = request.GET.get("page")
+
+        if pg is not None:
+            page_num = int(pg)
+
+            # If you have only 2 pages, but the query param sends in page=3,
+            # it will just return the last page (page 2)
+            return Response(page_studio_lst.get_page(page_num).object_list)
+        else:
+            # Defaults to returning the whole list of studios if no page is given.
+            return Response(serialized_lst)
 
 
 class StudioMapsDirectionsView(APIView):
