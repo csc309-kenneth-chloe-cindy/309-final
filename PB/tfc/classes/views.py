@@ -11,9 +11,17 @@ from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
 
 
 class UnenrollFuture(APIView):
+    """
+    Unenrolls a user from all future instances of a class, pointed to by <class_id>.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
+        """
+        delete:
+        Unenrolls the user from all future instances of a particular class, specified by `class_id`.
+        """
         user = request.user
         class_offering = get_object_or_404(ClassOffering, pk=kwargs['class_id'])
         num_deleted = 0
@@ -27,9 +35,16 @@ class UnenrollFuture(APIView):
 
 
 class UnenrollSingle(APIView):
+    """
+    Unenrolls a user from one instance of a class, pointed to by <class_id>.
+    """
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
+        """
+        delete:
+        Unenrolls the user from one instance of a particular class, specified by `class_id`.
+        """
         user = request.user
         class_instance = get_object_or_404(ClassInstance, pk=kwargs['class_id'])
         try:
@@ -51,9 +66,16 @@ class UnenrollSingle(APIView):
 
 # Create your views here.
 class EnrollFuture(APIView):
+    """
+    Enrolls a user to all future instances of a class, pointed to by <class_id>.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        """
+        post:
+        Enrolls a user to all future instances of a class, pointed to by <class_id>.
+        """
         user = request.user
         class_offering = get_object_or_404(ClassOffering, pk=kwargs['class_id'])
         enrolled_classes = None
@@ -67,9 +89,16 @@ class EnrollFuture(APIView):
 
 
 class EnrollSingleInstance(APIView):
+    """
+    Enrolls a user to one instances of a class, pointed to by <class_id>.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        """
+        post:
+        Enrolls a user to one instances of a class, pointed to by <class_id>.
+        """
         user = request.user
         class_instance = get_object_or_404(ClassInstance, pk=kwargs['class_id'])
         ret = None
