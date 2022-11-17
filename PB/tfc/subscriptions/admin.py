@@ -7,3 +7,4 @@ admin.site.register(SubscriptionPlan)
 # TODO: remove after done with TESTING
 admin.site.register(Subscription)
 admin.site.register(PaymentHistory)
+admin.site.register(PaymentMethod)
