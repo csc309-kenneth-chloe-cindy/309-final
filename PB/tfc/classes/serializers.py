@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from classes.models import ClassOffering, TimeInterval, ClassInstance
 from studios.serializers import StudioSerializer
 from .models import ClassOffering, ClassInstance, TimeInterval
 
@@ -11,7 +12,6 @@ class ClassOfferingSerializer(serializers.ModelSerializer):
         model = ClassOffering
         fields = ["name", "description", "coach", "capacity", "end_recursion_date", "studio",
                   "studio_id"]
-
 
 class TimeIntervalSerializer(serializers.ModelSerializer):
     class_offering = ClassOfferingSerializer(read_only=True)
