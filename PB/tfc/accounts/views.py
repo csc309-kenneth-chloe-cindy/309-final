@@ -32,7 +32,7 @@ class RetrieveClassScheduleView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        filtered_lst = UserEnroll.objects.filter(user__id=user_id).order_by('class_offering')
+        filtered_lst = UserEnroll.objects.filter(user__id=user_id)
 
         schedule = list(set([o.class_offering for o in filtered_lst]))
 
@@ -47,7 +47,7 @@ class RetrieveClassScheduleView(APIView):
 
         serialized_lst = [ClassOfferingSerializer(c[0]).data for c in schedule_sorted]
 
-        page_class_lst = Paginator(serialized_lst, 1)
+        page_class_lst = Paginator(serialized_lst, 10)
 
         pg = request.GET.get("page")
 
