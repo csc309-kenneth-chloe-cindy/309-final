@@ -11,6 +11,7 @@ from .exceptions import EnrollmentException, CapacityException, NotSubscribedExc
     TargetInPastException
 from subscriptions.models import has_active_subscription
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 # based on https://stackoverflow.com/questions/5966629/django-days-of-week-representation-in-model
 DAYS_OF_WEEK = (
@@ -22,6 +23,13 @@ DAYS_OF_WEEK = (
     (5, 'Saturday'),
     (6, 'Sunday'),
 )
+
+
+def end_recursion_only_gte_today(value):
+    today = datetime.date.today()
+
+    if value < today:
+        raise ValidationError("End_Recursion_Date cannot be in the past")
 
 
 def get_next_weekday(date, day_num):
@@ -67,7 +75,7 @@ class ClassOffering(models.Model):
     description = models.CharField(max_length=200, null=False)
     coach = models.CharField(max_length=200, null=False)
     capacity = models.PositiveIntegerField(null=False)
-    end_recursion_date = models.DateField()
+    end_recursion_date = models.DateField(validators=[end_recursion_only_gte_today])
     studio = models.ForeignKey(to=Studio, on_delete=CASCADE)
 
     def delete_future_instances(self):
