@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from .exceptions import EnrollmentException, CapacityException, NotSubscribedException, \
     TargetInPastException
 
-from .serializers import ClassOfferingSerializer, ClassInstanceSerializer
+from .serializers import ClassInstanceSerializer
 
 
 class UnenrollFuture(APIView):
@@ -43,16 +43,16 @@ class UnenrollSingle(APIView):
             class_instance.unenroll_user(user)
         except (TargetInPastException):
             return Response({"Message": "Unenrollment target is in the past"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
         except (NotSubscribedException):
             return Response({"Message": "User is not subscribed"},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_403_FORBIDDEN)
         except (CapacityException):
             return Response({"Message": "Class is already empty"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_409_CONFLICT)
         except (EnrollmentException):
             return Response({"Message": "User already unenrolled"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_409_CONFLICT)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -71,7 +71,7 @@ class EnrollFuture(APIView):
             enrolled_classes = class_offering.enroll_user(user)
         except (NotSubscribedException):
             return Response({"Message": "User is not subscribed"},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_403_FORBIDDEN)
         return Response({"Message": f"Enrolled in {len(enrolled_classes)} classes"},
                         status=status.HTTP_200_OK)
 
@@ -90,15 +90,15 @@ class EnrollSingleInstance(APIView):
             ret = class_instance.enroll_user(user)
         except (TargetInPastException):
             return Response({"Message": "Enrollment target is in the past"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
         except (NotSubscribedException):
             return Response({"Message": "User is not subscribed"},
-                            status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_403_FORBIDDEN)
         except (CapacityException):
             return Response({"Message": "Class at full capacity"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_409_CONFLICT)
         except (EnrollmentException):
             return Response({"Message": "User already enrolled"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_409_CONFLICT)
         serializer = ClassInstanceSerializer(ret)
         return Response(serializer.data, status=status.HTTP_200_OK)
