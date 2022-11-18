@@ -9,9 +9,13 @@ class StudioImageInline(admin.TabularInline):
     fields = ['image']
 
 
+class StudioAmenitiesInline(admin.TabularInline):
+    model = StudioAmenities
+
+
 class StudioAdmin(admin.ModelAdmin):
-    inlines = [StudioImageInline]
-    fields = fields = ['name', 'address', 'postal_code', 'phone_num', 'longitude', 'latitude']
+    inlines = [StudioImageInline, StudioAmenitiesInline]
+    fields = ['name', 'address', 'postal_code', 'phone_num', 'longitude', 'latitude']
 
 
 admin.site.register(Studio, StudioAdmin)
