@@ -1,32 +1,54 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import UpdateAPIView
-from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory
+from .models import Subscription, SubscriptionPlan, PaymentMethod, PaymentHistory, \
+    has_active_subscription
 from classes.models import ClassInstance
 from django.shortcuts import get_list_or_404, get_object_or_404
 from .serializers import SubscriptionSerializer, PaymentHistorySerializer, PaymentMethodSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import LimitOffsetPagination
-from dateutil.relativedelta import relativedelta
+
+
+def cancel_user_subscription(user):
+    subscription = get_object_or_404(Subscription, user=user)
+    billing_period_end = subscription.get_billing_period_end()
+    to_unenroll = ClassInstance.objects \
+        .filter(userenroll__user__pk=user.id).filter(date__gt=billing_period_end)
+    for class_instance in to_unenroll:
+        try:
+            class_instance.unenroll_user(user)
+        except Exception as error:
+            print(error)
+    return subscription.payment_method.delete()
 
 
 # Create your views here.
 
 
 class UpdatePaymentMethodView(UpdateAPIView):
+    """
+    Updates a payment method that is owned by user with id `user_id`.
+    """
     serializer_class = PaymentMethodSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        return get_object_or_404(PaymentMethod, pk=self.kwargs['pk'])
+        return get_object_or_404(PaymentMethod, subscription__user=self.request.user)
 
 
 class GetPaymentHistory(APIView, LimitOffsetPagination):
+    """
+    Retrieve payment history and future payment for the current user
+
+    Params:
+        `?limit=` - specifies limit per page of the list of payments
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user_id = kwargs["user_id"]
+        user_id = self.request.user
         subscription = get_object_or_404(Subscription, user=user_id)
 
         payment_historys = get_list_or_404(PaymentHistory,
@@ -46,72 +68,33 @@ class GetPaymentHistory(APIView, LimitOffsetPagination):
         return self.get_paginated_response(response_data)
 
 
-class UpdateSubscription(UpdateAPIView):
-    serializer_class = SubscriptionSerializer
+class SubscriptionDetail(APIView):
+    """
+    Create, Update and Delete a user's unique Subscription.
 
-    def get_object(self):
-        return get_object_or_404(Subscription, pk=self.kwargs['pk'])
-
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-
-class DeleteUpdateSubscription(APIView):
+    """
     permission_classes = [IsAuthenticated]
-
-    def _get_billing_period_end(self, date):
-        return date + relativedelta(days=-1)
 
     def get_object(self, pk):
         return get_object_or_404(Subscription, pk=pk)
 
     def patch(self, request, *args, **kwargs):
-        """
-        only allows patch of subscription type
-
-
-        """
-        orig_subscription = self.get_object(kwargs['pk'])
-        new_subscription_type = request.data["subscription_type_id"]
-        orig_subscription.subscription_type = new_subscription_type
-        orig_subscription.save()
-        serializer = SubscriptionSerializer(orig_subscription)
+        orig_subscription = get_object_or_404(Subscription, user=request.user)
+        new_subscription_type_id = request.data["subscription_type_id"]
+        altered_subscription = orig_subscription.change_subscription_type(new_subscription_type_id)
+        serializer = SubscriptionSerializer(altered_subscription)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, *args, **kwargs):
-        orig_subscription = self.get_object(kwargs['pk'])
-        orig_payment_date = orig_subscription.next_payment_date
-        serializer = SubscriptionSerializer(orig_subscription, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
     def delete(self, request, *args, **kwargs):
-        subscription = self.get_object(kwargs['pk'])
+        delete_result = cancel_user_subscription(request.user)
 
-        billing_period_end = self._get_billing_period_end(subscription.next_payment_date)
-        to_unenroll = ClassInstance.objects \
-            .filter(userenroll__user__pk=subscription.user.id).filter(date__gt=billing_period_end)
-        for class_instance in to_unenroll:
-            class_instance.capacity_count -= 1
-
-            class_instance.userenroll_set.all().delete()
-            class_instance.save()
-        subscription.delete()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(delete_result, status=status.HTTP_200_OK)
         # drop classes
 
-
-class SubscriptionDetail(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, pk):
-        return get_object_or_404(Subscription, pk=pk)
-
     def post(self, request, *args, **kwargs):
-        #TODO: restrict it so only one subscription per user. Maybe one to one relation
+        if has_active_subscription(request.user.id):
+            return Response({"Message": "User already has active subscription"},
+                            status=status.HTTP_409_CONFLICT)
         subscription_serializer = SubscriptionSerializer(data=request.data,
                                                          context={'user': request.user})
         if subscription_serializer.is_valid():
