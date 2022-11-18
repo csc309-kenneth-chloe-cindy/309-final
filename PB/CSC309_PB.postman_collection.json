@@ -19,7 +19,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "u6",
+									"value": "elonmusk",
 									"type": "text"
 								},
 								{
@@ -94,7 +94,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "u5",
+									"value": "elonmusk",
 									"type": "text"
 								},
 								{
@@ -348,7 +348,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"latitude\": \"bruh\",\n    \"longitude\": \"-79.39900559414212\"\n}",
+							"raw": "{\n    \"latitude\": \"43.65860822201373\",\n    \"longitude\": \"-79.39900559414212\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -430,7 +430,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/studios/1/amenities/list/?limit=3",
+							"raw": "http://127.0.0.1:8000/studios/1/amenities/list/?limit=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -449,7 +449,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -472,7 +472,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/studios/1/images/list/?limit=3",
+							"raw": "http://127.0.0.1:8000/studios/1/images/list/?limit=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -491,7 +491,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -514,7 +514,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/studios/25/directions/",
+							"raw": "http://127.0.0.1:8000/studios/1/directions/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -525,7 +525,7 @@
 							"port": "8000",
 							"path": [
 								"studios",
-								"25",
+								"1",
 								"directions",
 								""
 							]
