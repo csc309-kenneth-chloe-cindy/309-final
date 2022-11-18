@@ -30,7 +30,7 @@ class RetrieveStudioView(RetrieveAPIView):
     Retrieves a studio with the id `studio_id`.
     """
     serializer_class = StudioSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return get_object_or_404(Studio, id=self.kwargs['studio_id'])
@@ -60,7 +60,7 @@ class StudioListView(APIView, LimitOffsetPagination):
     Params:
         `?page=` - Specifies the page # of the list of studios.
     """
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get(self, request):
@@ -117,7 +117,7 @@ class StudioListFilterView(APIView):
         }`
     """
     serializer_class = StudioSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         raw_filters = request.data
@@ -180,7 +180,7 @@ class StudioListFilterClassesView(APIView):
         }```
     """
     serializer_class = ClassOfferingSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, studio_id):
         raw_filters = request.data
@@ -232,8 +232,7 @@ class StudioMapsDirectionsView(APIView):
 
     Example Output: `https://www.google.com/maps/dir/?api=1&destination=43.661430,-79.397000`
     """
-
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, studio_id):
         link_base = "https://www.google.com/maps/dir/?api=1&destination="
@@ -258,7 +257,7 @@ class StudioClassListView(APIView, LimitOffsetPagination):
         `?page=` - Specifies the page # of the list of classes.
     """
 
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get(self, request, studio_id):
@@ -332,7 +331,7 @@ class RetrieveStudioImageView(ListAPIView, LimitOffsetPagination):
         `?page=` - Specifies the page # of the list of studio images.
     """
     serializer_class = StudioImageSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
@@ -361,7 +360,7 @@ class RetrieveAmenitiesView(ListAPIView, LimitOffsetPagination):
         `?page=` - Specifies the page # of the list of amenities.
     """
     serializer_class = AmenitySerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
