@@ -19,7 +19,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "u5",
+									"value": "elonmusk",
 									"type": "text"
 								},
 								{
@@ -50,7 +50,7 @@
 								{
 									"key": "avatar",
 									"type": "file",
-									"src": "/Users/chloezhao/Downloads/peek.png"
+									"src": "sample.jpg"
 								}
 							]
 						},
@@ -80,7 +80,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.collectionVariables.set(\"access_key\", pm.response.json().access);"
+									"pm.environment.set(\"access_key\", pm.response.json().access);"
 								],
 								"type": "text/javascript"
 							}
@@ -143,7 +143,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "elonmusk",
+									"value": "u6",
 									"type": "text"
 								},
 								{
@@ -179,7 +179,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/accounts/1/update/",
+							"raw": "http://127.0.0.1:8000/accounts/update/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -190,7 +190,6 @@
 							"port": "8000",
 							"path": [
 								"accounts",
-								"1",
 								"update",
 								""
 							]
@@ -224,7 +223,7 @@
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/accounts/1/update/",
+							"raw": "http://127.0.0.1:8000/accounts/update/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -235,7 +234,6 @@
 							"port": "8000",
 							"path": [
 								"accounts",
-								"1",
 								"update",
 								""
 							]
@@ -350,7 +348,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"latitude\": \"43.65792466303926\",\n    \"longitude\": \"-79.39900559414212\"\n}",
+							"raw": "{\n    \"latitude\": \"43.65860822201373\",\n    \"longitude\": \"-79.39900559414212\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -432,7 +430,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/studios/1/amenities/list/?limit=3",
+							"raw": "http://127.0.0.1:8000/studios/1/amenities/list/?limit=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -451,7 +449,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -474,7 +472,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/studios/1/images/list/?limit=3",
+							"raw": "http://127.0.0.1:8000/studios/1/images/list/?limit=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -493,7 +491,7 @@
 							"query": [
 								{
 									"key": "limit",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -690,13 +688,13 @@
 			"name": "Subscriptions",
 			"item": [
 				{
-					"name": "Post subscription and make single payment",
+					"name": "Post subscription and make single payment for current user",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"subscription_type_id\": 2,\n    \"payment_method\": {\n        \"card_number\": 222244445555,\n        \"security_code\": 363\n\n    }\n}",
+							"raw": "{\n    \"subscription_type_id\": 2,\n    \"payment_method\": {\n        \"card_number\": 2,\n        \"security_code\": 2\n\n    }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -723,7 +721,41 @@
 					"response": []
 				},
 				{
-					"name": "Update Payment Info",
+					"name": "UPDATE Subscription of current user",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "subscription_type_id",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/subscriptions/subscription/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"subscriptions",
+								"subscription",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment Info for current user",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -737,13 +769,13 @@
 								},
 								{
 									"key": "security_code",
-									"value": "7",
+									"value": "9999",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/subscriptions/payment_method/2/",
+							"raw": "http://127.0.0.1:8000/subscriptions/payment_method/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -755,7 +787,6 @@
 							"path": [
 								"subscriptions",
 								"payment_method",
-								"2",
 								""
 							]
 						}
@@ -763,12 +794,12 @@
 					"response": []
 				},
 				{
-					"name": "Get Payment History",
+					"name": "Get Payment History for current user",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/subscriptions/payment_history/1/?limit=1",
+							"raw": "http://127.0.0.1:8000/subscriptions/payment_history/?limit=1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -780,7 +811,6 @@
 							"path": [
 								"subscriptions",
 								"payment_history",
-								"1",
 								""
 							],
 							"query": [
@@ -794,12 +824,12 @@
 					"response": []
 				},
 				{
-					"name": "Delete Subscription",
+					"name": "Delete Subscription for current user",
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/subscriptions/subscription/22/",
+							"raw": "http://127.0.0.1:8000/subscriptions/subscription/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -811,7 +841,6 @@
 							"path": [
 								"subscriptions",
 								"subscription",
-								"22",
 								""
 							]
 						}
